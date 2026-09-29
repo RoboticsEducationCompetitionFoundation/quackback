@@ -1,4 +1,16 @@
-import { db, eq, and, isNull, sql, boards, posts, type Board } from '@/lib/server/db'
+import {
+  db,
+  eq,
+  and,
+  or,
+  isNull,
+  inArray,
+  sql,
+  boards,
+  posts,
+  postStatuses,
+  type Board,
+} from '@/lib/server/db'
 import { getTableColumns } from 'drizzle-orm'
 import type { BoardId } from '@quackback/ids'
 import { InternalError } from '@/lib/shared/errors'
@@ -69,7 +81,24 @@ export async function listPublicBoardsWithStats(
       .from(boards)
       .leftJoin(
         posts,
-        and(eq(posts.boardId, boards.id), isNull(posts.deletedAt), postViewFilter(actor))
+        and(
+          eq(posts.boardId, boards.id),
+          isNull(posts.deletedAt),
+          postViewFilter(actor),
+          // Same default as the portal post list (post.public.ts): Complete and
+          // Closed posts are hidden unless a status filter asks for them, so the
+          // count beside a board matches the list it opens onto.
+          or(
+            isNull(posts.statusId),
+            inArray(
+              posts.statusId,
+              db
+                .select({ id: postStatuses.id })
+                .from(postStatuses)
+                .where(eq(postStatuses.category, 'active'))
+            )
+          )
+        )
       )
       // boardViewFilter embeds isNull(boards.deletedAt) in every branch — no
       // outer guard needed here. Callers of postViewFilter still need their
