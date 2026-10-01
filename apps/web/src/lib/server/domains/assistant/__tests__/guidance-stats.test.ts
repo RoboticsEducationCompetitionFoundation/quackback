@@ -46,8 +46,10 @@ describe.skipIf(!fixture.available)('getGuidanceRuleStats (real DB)', () => {
   afterAll(fixture.close)
 
   it('returns Applied count and lastAppliedAt only', async () => {
-    const first = new Date('2026-07-01T00:00:00.000Z')
-    const second = new Date('2026-07-02T00:00:00.000Z')
+    // Relative to now so the rows stay inside the retention window; fixed
+    // dates silently aged out of it and the test started failing.
+    const first = new Date(Date.now() - 2 * 24 * 60 * 60 * 1_000)
+    const second = new Date(Date.now() - 1 * 24 * 60 * 60 * 1_000)
     await seedTurn(['assistant_guidance_a'], { createdAt: first })
     await seedTurn(['assistant_guidance_a'], { createdAt: second })
 

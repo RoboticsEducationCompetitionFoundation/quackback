@@ -45,6 +45,11 @@ test.describe('Portal Support tab', { tag: '@smoke' }, () => {
 
     // A fresh user has no conversations: the empty state renders.
     await page.goto('/support')
+    // A magic-link account carries no first/last name, so the portal asks for
+    // one (components/portal/name-prompt.tsx). The dialog is modal and hides
+    // the page from role queries; "Not now" sticks for this tab's session, so
+    // dismissing it once keeps the second visit below clear too.
+    await page.getByRole('button', { name: 'Not now' }).click({ timeout: 10000 })
     await expect(page.getByRole('heading', { name: 'Support' })).toBeVisible({ timeout: 10000 })
     await expect(page.getByText('No conversations yet')).toBeVisible({ timeout: 10000 })
 

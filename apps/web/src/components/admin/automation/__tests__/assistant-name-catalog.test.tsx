@@ -103,7 +103,10 @@ describe('the catalog is what defeats the substitution', () => {
     const { readFileSync } = await import('node:fs')
     const { join } = await import('node:path')
     const { walkSourceFiles } = await import('@/lib/server/policy/source-files')
-    const offenders = walkSourceFiles(join(process.cwd(), 'src')).filter((f) =>
+    // Resolve from this file, not cwd: the root vitest config runs from the
+    // repo root, where `<cwd>/src` does not exist.
+    const srcRoot = join(__dirname, '../../../..') // apps/web/src
+    const offenders = walkSourceFiles(srcRoot).filter((f) =>
       /defaultMessage:\s*(formattedW|w)ithAssistantName\(/.test(readFileSync(f, 'utf8'))
     )
     expect(offenders).toEqual([])

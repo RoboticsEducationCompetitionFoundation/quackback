@@ -12,6 +12,10 @@ vi.mock('@tanstack/react-router', async () => {
   }
 })
 
+vi.mock('@/lib/client/hooks/use-assistant-name', () => ({
+  useAssistantName: () => 'Quinn',
+}))
+
 vi.mock('@tanstack/react-query', () => ({
   useSuspenseQuery: (opts: { queryKey: string[] }) => {
     if (opts.queryKey.includes('widgetConfig')) {

@@ -8,23 +8,11 @@ vi.mock('@tanstack/react-start/server', () => ({
 
 // Mock db
 const mockSessionFindFirst = vi.fn()
-const mockPrincipalFindFirst = vi.fn()
-const mockInsert = vi.fn()
-const mockReturning = vi.fn()
-const mockValues = vi.fn(() => {
-  const chain = { returning: mockReturning, onConflictDoNothing: () => chain }
-  return chain
-})
 
 vi.mock('@/lib/server/db', () => ({
   db: {
     query: {
       session: { findFirst: (...args: unknown[]) => mockSessionFindFirst(...args) },
-      principal: { findFirst: (...args: unknown[]) => mockPrincipalFindFirst(...args) },
-    },
-    insert: (...args: unknown[]) => {
-      mockInsert(...args)
-      return { values: mockValues }
     },
   },
   session: { token: 'token', expiresAt: 'expiresAt', userId: 'userId' },
@@ -34,8 +22,12 @@ vi.mock('@/lib/server/db', () => ({
   gt: vi.fn(),
 }))
 
-vi.mock('@quackback/ids', () => ({
-  generateId: vi.fn(() => 'principal_mock123'),
+// Principal resolution is the factory's job (read-first, race-safe insert);
+// here we only care that widget-auth hands it the session user and presents
+// whatever it returns at widget tier.
+const mockEnsurePrincipal = vi.fn()
+vi.mock('@/lib/server/domains/principals/principal.factory', () => ({
+  ensurePrincipalForUser: (...args: unknown[]) => mockEnsurePrincipal(...args),
 }))
 
 // Mock workspace settings
@@ -105,10 +97,9 @@ describe('getWidgetSession', () => {
       userId: 'user_1',
       user: { id: 'user_1', email: 'jane@acme.com', name: 'Jane', image: null },
     })
-    mockPrincipalFindFirst.mockResolvedValue({
-      id: 'principal_1',
-      role: 'user',
-      type: 'anonymous',
+    mockEnsurePrincipal.mockResolvedValue({
+      principal: { id: 'principal_1', role: 'user', type: 'anonymous' },
+      created: false,
     })
 
     const result = await getWidgetSession()
@@ -124,10 +115,9 @@ describe('getWidgetSession', () => {
       userId: 'user_1',
       user: { id: 'user_1', email: 'jane@acme.com', name: 'Jane', image: 'https://avatar.url' },
     })
-    mockPrincipalFindFirst.mockResolvedValue({
-      id: 'principal_1',
-      role: 'user',
-      type: 'user',
+    mockEnsurePrincipal.mockResolvedValue({
+      principal: { id: 'principal_1', role: 'user', type: 'user' },
+      created: false,
     })
 
     const result = await getWidgetSession()
@@ -136,54 +126,74 @@ describe('getWidgetSession', () => {
       settings: { id: 'ws_123', slug: 'acme', name: 'Acme Inc' },
       user: { id: 'user_1', email: 'jane@acme.com', name: 'Jane', image: 'https://avatar.url' },
       principal: { id: 'principal_1', role: 'user', type: 'user' },
+      canPortalHandoff: true,
     })
   })
 
-  it('should auto-create principal when none exists', async () => {
+  it('lazily creates the principal from the session user when none exists', async () => {
     mockGet.mockReturnValue('Bearer valid-token-123')
     mockSessionFindFirst.mockResolvedValue({
       userId: 'user_1',
       user: { id: 'user_1', email: 'jane@acme.com', name: 'Jane', image: null },
     })
-    mockPrincipalFindFirst.mockResolvedValue(null)
-    mockReturning.mockResolvedValue([{ id: 'principal_mock123', role: 'user' }])
+    mockEnsurePrincipal.mockResolvedValue({
+      principal: { id: 'principal_mock123', role: 'user', type: 'user' },
+      created: true,
+    })
 
     const result = await getWidgetSession()
 
-    expect(mockInsert).toHaveBeenCalled()
-    expect(mockValues).toHaveBeenCalledWith(
-      expect.objectContaining({
-        id: 'principal_mock123',
-        userId: 'user_1',
-        role: 'user',
-        displayName: 'Jane',
-        avatarUrl: null,
-      })
-    )
+    expect(mockEnsurePrincipal).toHaveBeenCalledWith({
+      userId: 'user_1',
+      role: 'user',
+      displayName: 'Jane',
+      avatarUrl: null,
+    })
     expect(result).toEqual({
       settings: { id: 'ws_123', slug: 'acme', name: 'Acme Inc' },
       user: { id: 'user_1', email: 'jane@acme.com', name: 'Jane', image: null },
       principal: { id: 'principal_mock123', role: 'user', type: 'user' },
+      canPortalHandoff: true,
     })
   })
 
-  it('should handle null image gracefully', async () => {
+  it('presents a teammate at widget tier and blocks the portal handoff', async () => {
+    // A teammate's Bearer (or a reused dashboard cookie) must not unlock team
+    // actions through widget endpoints, and the widget must not mint them a
+    // portal OTT.
     mockGet.mockReturnValue('Bearer valid-token-123')
     mockSessionFindFirst.mockResolvedValue({
       userId: 'user_1',
       user: { id: 'user_1', email: 'test@test.com', name: 'Test', image: null },
     })
-    mockPrincipalFindFirst.mockResolvedValue({
-      id: 'principal_1',
-      role: 'member',
-      type: 'user',
+    mockEnsurePrincipal.mockResolvedValue({
+      principal: { id: 'principal_1', role: 'member', type: 'user' },
+      created: false,
     })
 
     const result = await getWidgetSession()
 
     expect(result?.user.image).toBeNull()
-    expect(result?.principal.role).toBe('member')
+    expect(result?.principal.role).toBe('user')
     expect(result?.principal.type).toBe('user')
+    expect(result?.canPortalHandoff).toBe(false)
+  })
+
+  it('blocks the portal handoff for admins too', async () => {
+    mockGet.mockReturnValue('Bearer valid-token-123')
+    mockSessionFindFirst.mockResolvedValue({
+      userId: 'user_1',
+      user: { id: 'user_1', email: 'test@test.com', name: 'Test', image: null },
+    })
+    mockEnsurePrincipal.mockResolvedValue({
+      principal: { id: 'principal_1', role: 'admin', type: 'user' },
+      created: false,
+    })
+
+    const result = await getWidgetSession()
+
+    expect(result?.principal.role).toBe('user')
+    expect(result?.canPortalHandoff).toBe(false)
   })
 
   it('resolves an uploaded imageKey when user.image is null', async () => {
@@ -198,10 +208,9 @@ describe('getWidgetSession', () => {
         imageKey: 'avatars/me.png',
       },
     })
-    mockPrincipalFindFirst.mockResolvedValue({
-      id: 'principal_1',
-      role: 'member',
-      type: 'user',
+    mockEnsurePrincipal.mockResolvedValue({
+      principal: { id: 'principal_1', role: 'user', type: 'user' },
+      created: false,
     })
 
     const result = await getWidgetSession()
