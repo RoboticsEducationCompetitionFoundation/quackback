@@ -1,0 +1,101 @@
+name: Deploy Azure
+
+# Builds the production image from main, pushes it to Azure Container Registry
+# and points the App Service at the new tag. Authentication is OIDC against a
+# user-assigned managed identity (recf-quack-github in RECF-Quack) that holds
+# AcrPush on the registry and Website Contributor on the web app only, so no
+# Azure credential is stored in GitHub. Its federated credential trusts
+# `repo:<this repo>:ref:refs/heads/main`, which is why the job is limited to
+# that ref.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Deploys must not overlap or be cancelled mid-flight; later pushes queue.
+concurrency:
+  group: deploy-azure
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AZURE_RESOURCE_GROUP: RECF-Quack
+  AZURE_WEBAPP_NAME: recf-quack-app
+  ACR_LOGIN_SERVER: recfquack.azurecr.io
+  IMAGE_REPOSITORY: quackback
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+
+      - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2.3.1
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name "${ACR_LOGIN_SERVER%%.*}"
+
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
+
+      - name: Resolve image tags
+        run: |
+          echo "IMAGE=${ACR_LOGIN_SERVER}/${IMAGE_REPOSITORY}" >> "$GITHUB_ENV"
+          echo "TAG=sha-${GITHUB_SHA::9}" >> "$GITHUB_ENV"
+
+      # App Service B1 is linux/amd64 only, so a single-arch build is enough.
+      # The checkout is a Linux runner, so shell scripts keep LF line endings.
+      - name: Build and push image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+        with:
+          context: .
+          file: ./apps/web/Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ env.TAG }}
+            ${{ env.IMAGE }}:main
+          cache-from: type=gha,scope=azure-amd64
+          cache-to: type=gha,mode=max,scope=azure-amd64
+
+      # Setting the image triggers a container restart; the explicit restart
+      # ensures the health poll below is observing the new container rather
+      # than the old one still draining.
+      - name: Update App Service image
+        run: |
+          az webapp config container set \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --container-image-name "${IMAGE}:${TAG}" \
+            --output none
+          az webapp restart \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME"
+
+      # The entrypoint runs database migrations before serving, so readiness
+      # (db + migrations + workers) is the signal that the deploy completed.
+      - name: Wait for the new container to become ready
+        run: |
+          HOST=$(az webapp show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$AZURE_WEBAPP_NAME" \
+            --query defaultHostName --output tsv)
+          sleep 45
+          for attempt in $(seq 1 24); do
+            if body=$(curl -fsS --max-time 20 "https://${HOST}/api/health/ready"); then
+              echo "ready after attempt ${attempt}: ${body}"
+              exit 0
+            fi
+            echo "attempt ${attempt}: not ready yet"
+            sleep 20
+          done
+          echo "::error::${AZURE_WEBAPP_NAME} did not become ready; previous image is no longer running — inspect the container logs."
+          exit 1
