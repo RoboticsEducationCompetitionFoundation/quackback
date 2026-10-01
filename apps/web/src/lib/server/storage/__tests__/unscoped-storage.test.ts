@@ -20,7 +20,7 @@
  * primary key — and a test that inherited that memo from the test above it would
  * be asserting about the previous run rather than its own.
  */
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockConfig = {
   s3Bucket: 'self-hosted-bucket',
@@ -31,6 +31,9 @@ const mockConfig = {
   s3ForcePathStyle: true,
   s3PublicUrl: undefined as string | undefined,
   s3Proxy: false,
+  azureStorageAccountName: undefined as string | undefined,
+  azureStorageAccountKey: undefined as string | undefined,
+  azureStorageBlobEndpoint: undefined as string | undefined,
   baseUrl: 'https://self-hosted.example.com',
 }
 vi.mock('@/lib/server/config', () => ({ config: mockConfig }))
@@ -83,6 +86,9 @@ async function freshStorage() {
 beforeEach(() => {
   sent.length = 0
   findFirst.mockReset()
+  mockConfig.azureStorageAccountName = undefined
+  mockConfig.azureStorageAccountKey = undefined
+  mockConfig.azureStorageBlobEndpoint = undefined
 })
 
 describe('a self-hosted process', () => {
@@ -163,5 +169,125 @@ describe('a pooled process with no scope', () => {
     await expect(deleteObject(KEY)).rejects.toThrow(WorkspaceScopeMissingError)
     await expect(generatePresignedGetUrl(KEY, 60)).rejects.toThrow(WorkspaceScopeMissingError)
     expect(sent).toHaveLength(0)
+  })
+})
+
+describe('a self-hosted process on Azure Blob Storage', () => {
+  const BLOB_PREFIX = `https://quackacct.blob.core.windows.net/self-hosted-bucket/w/${LOCAL_WORKSPACE}/`
+  const requests: Array<{ url: URL; method: string; headers: Headers }> = []
+  let respond: () => Response
+
+  beforeEach(() => {
+    mockConfig.azureStorageAccountName = 'quackacct'
+    mockConfig.azureStorageAccountKey = Buffer.from('test-account-key').toString('base64')
+    requests.length = 0
+    respond = () => new Response(null, { status: 201 })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string, init?: RequestInit) => {
+        requests.push({
+          url: new URL(input),
+          method: init?.method ?? 'GET',
+          headers: new Headers(init?.headers),
+        })
+        return respond()
+      })
+    )
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('writes a block blob into the namespaced name with a write-only SAS', async () => {
+    findFirst.mockResolvedValue({ id: LOCAL_WORKSPACE })
+    const { uploadObject } = await freshStorage()
+
+    await uploadObject(KEY, BYTES, 'application/zip')
+
+    expect(sent).toHaveLength(0)
+    expect(requests).toHaveLength(1)
+    const req = requests[0]!
+    expect(req.method).toBe('PUT')
+    expect(`${req.url.origin}${req.url.pathname}`).toBe(`${BLOB_PREFIX}${KEY}`)
+    expect(req.url.searchParams.get('sp')).toBe('cw')
+    expect(req.url.searchParams.get('sr')).toBe('b')
+    expect(req.url.searchParams.get('spr')).toBe('https')
+    expect(req.url.searchParams.get('sig')).toBeTruthy()
+    expect(req.headers.get('x-ms-blob-type')).toBe('BlockBlob')
+    expect(req.headers.get('x-ms-blob-content-type')).toBe('application/zip')
+  })
+
+  it('reads the blob body and content type', async () => {
+    findFirst.mockResolvedValue({ id: LOCAL_WORKSPACE })
+    respond = () =>
+      new Response('zip-bytes', { status: 200, headers: { 'content-type': 'application/zip' } })
+    const { getS3Object } = await freshStorage()
+
+    const got = await getS3Object(KEY)
+
+    expect(await new Response(got.body).text()).toBe('zip-bytes')
+    expect(got.contentType).toBe('application/zip')
+    expect(requests[0]!.url.searchParams.get('sp')).toBe('r')
+  })
+
+  it('reports a missing blob as NotFound with a 404 status', async () => {
+    findFirst.mockResolvedValue({ id: LOCAL_WORKSPACE })
+    respond = () =>
+      new Response(null, { status: 404, headers: { 'x-ms-error-code': 'BlobNotFound' } })
+    const { getS3Object } = await freshStorage()
+
+    await expect(getS3Object(KEY)).rejects.toMatchObject({
+      name: 'NotFound',
+      $metadata: { httpStatusCode: 404 },
+    })
+  })
+
+  it('treats deleting a missing blob as success', async () => {
+    findFirst.mockResolvedValue({ id: LOCAL_WORKSPACE })
+    respond = () => new Response(null, { status: 404 })
+    const { deleteObject } = await freshStorage()
+
+    await expect(deleteObject(KEY)).resolves.toBeUndefined()
+    expect(requests[0]!.method).toBe('DELETE')
+    expect(requests[0]!.url.searchParams.get('sp')).toBe('d')
+  })
+
+  it('presigns a read-only GET with the download name, without a request', async () => {
+    findFirst.mockResolvedValue({ id: LOCAL_WORKSPACE })
+    const { generatePresignedGetUrl } = await freshStorage()
+
+    const url = new URL(await generatePresignedGetUrl(KEY, 60, 'export.zip'))
+
+    expect(requests).toHaveLength(0)
+    expect(`${url.origin}${url.pathname}`).toBe(`${BLOB_PREFIX}${KEY}`)
+    expect(url.searchParams.get('sp')).toBe('r')
+    expect(url.searchParams.get('rscd')).toBe('attachment; filename="export.zip"')
+  })
+
+  it('uses a custom blob endpoint when set', async () => {
+    findFirst.mockResolvedValue({ id: LOCAL_WORKSPACE })
+    mockConfig.azureStorageBlobEndpoint = 'http://127.0.0.1:10000/quackacct/'
+    const { generatePresignedGetUrl } = await freshStorage()
+
+    const url = new URL(await generatePresignedGetUrl(KEY, 60))
+
+    expect(`${url.origin}${url.pathname}`).toBe(
+      `http://127.0.0.1:10000/quackacct/self-hosted-bucket/w/${LOCAL_WORKSPACE}/${KEY}`
+    )
+    expect(url.searchParams.get('spr')).toBeNull()
+  })
+
+  it('still refuses in a pooled process with no scope', async () => {
+    const { WorkspaceScopeMissingError } = await import('@/lib/server/workspaces/workspace-context')
+    findFirst.mockImplementation(() => {
+      throw new WorkspaceScopeMissingError('A `db` call was made with no workspace resolved.')
+    })
+    const { uploadObject } = await freshStorage()
+
+    await expect(uploadObject(KEY, BYTES, 'application/zip')).rejects.toThrow(
+      WorkspaceScopeMissingError
+    )
+    expect(requests).toHaveLength(0)
   })
 })

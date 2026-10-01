@@ -181,6 +181,11 @@ const configSchema = z
     s3PublicUrl: z.string().optional(),
     s3Proxy: envBoolean,
 
+    // Azure Blob Storage (optional; replaces S3 for the unscoped path when set)
+    azureStorageAccountName: z.string().optional(),
+    azureStorageAccountKey: z.string().optional(),
+    azureStorageBlobEndpoint: z.string().optional(),
+
     // AI (optional)
     openaiApiKey: z.string().optional(),
     openaiBaseUrl: z.string().optional(),
@@ -306,6 +311,11 @@ function buildConfigFromEnv(): unknown {
     s3ForcePathStyle: env('S3_FORCE_PATH_STYLE'),
     s3PublicUrl: env('S3_PUBLIC_URL'),
     s3Proxy: env('S3_PROXY'),
+
+    // Azure Blob Storage
+    azureStorageAccountName: env('AZURE_STORAGE_ACCOUNT_NAME'),
+    azureStorageAccountKey: env('AZURE_STORAGE_ACCOUNT_KEY'),
+    azureStorageBlobEndpoint: env('AZURE_STORAGE_BLOB_ENDPOINT'),
 
     // AI
     openaiApiKey: env('OPENAI_API_KEY'),
@@ -530,6 +540,17 @@ export const config = {
   },
   get s3Proxy() {
     return loadConfig().s3Proxy
+  },
+
+  // Azure Blob Storage
+  get azureStorageAccountName() {
+    return loadConfig().azureStorageAccountName
+  },
+  get azureStorageAccountKey() {
+    return loadConfig().azureStorageAccountKey
+  },
+  get azureStorageBlobEndpoint() {
+    return loadConfig().azureStorageBlobEndpoint
   },
 
   // AI

@@ -296,6 +296,119 @@ export function getStorageSigningSecret(): string {
 }
 
 // ============================================================================
+// Azure Blob Storage
+// ============================================================================
+
+/**
+ * Azure Blob connection for the process-wide (unscoped) path. Selected when
+ * AZURE_STORAGE_ACCOUNT_NAME and AZURE_STORAGE_ACCOUNT_KEY are set; the
+ * container is S3_BUCKET. Object names are composed exactly as for S3, and
+ * S3_SECRET_ACCESS_KEY still signs the read and proxy-upload tokens.
+ *
+ * Every request is authorised with a short-lived service SAS signed by the
+ * account key, so no Azure SDK is needed.
+ */
+interface AzureBlobConfig {
+  accountName: string
+  accountKey: string
+  /** Blob service endpoint without a trailing slash. */
+  endpoint: string
+  container: string
+}
+
+const AZURE_SAS_VERSION = '2022-11-02'
+/** Lifetime of the SAS minted for one server-side request. */
+const AZURE_REQUEST_SAS_SECONDS = 300
+
+function getAzureBlobConfigOrNull(): AzureBlobConfig | null {
+  if (getCurrentWorkspace()) return null
+  const accountName = config.azureStorageAccountName
+  const accountKey = config.azureStorageAccountKey
+  if (!accountName || !accountKey) return null
+  const endpoint = config.azureStorageBlobEndpoint || `https://${accountName}.blob.core.windows.net`
+  return {
+    accountName,
+    accountKey,
+    endpoint: endpoint.replace(/\/+$/, ''),
+    container: getStoragePlacement().bucket,
+  }
+}
+
+/** A failed Blob request, shaped so the storage route recognises a 404. */
+export class AzureBlobRequestError extends Error {
+  readonly $metadata: { httpStatusCode: number }
+  constructor(operation: string, status: number, errorCode: string | null) {
+    super(`Azure Blob ${operation} failed: HTTP ${status}${errorCode ? ` ${errorCode}` : ''}`)
+    this.name = status === 404 ? 'NotFound' : 'AzureBlobRequestError'
+    this.$metadata = { httpStatusCode: status }
+  }
+}
+
+/**
+ * A blob-scoped service SAS query string.
+ * https://learn.microsoft.com/rest/api/storageservices/create-service-sas
+ */
+function azureBlobSas(
+  cfg: AzureBlobConfig,
+  blobName: string,
+  permissions: string,
+  expiresIn: number,
+  contentDisposition?: string
+): string {
+  const expiry = new Date(Date.now() + expiresIn * 1000).toISOString().replace(/\.\d{3}Z$/, 'Z')
+  const protocol = cfg.endpoint.startsWith('https:') ? 'https' : ''
+  const stringToSign = [
+    permissions,
+    '', // st
+    expiry,
+    `/blob/${cfg.accountName}/${cfg.container}/${blobName}`,
+    '', // si
+    '', // sip
+    protocol,
+    AZURE_SAS_VERSION,
+    'b', // sr
+    '', // snapshot time
+    '', // ses
+    '', // rscc
+    contentDisposition ?? '',
+    '', // rsce
+    '', // rscl
+    '', // rsct
+  ].join('\n')
+  const sig = createHmac('sha256', Buffer.from(cfg.accountKey, 'base64'))
+    .update(stringToSign, 'utf8')
+    .digest('base64')
+
+  const params: Array<[string, string]> = [
+    ['sv', AZURE_SAS_VERSION],
+    ['sr', 'b'],
+    ['sp', permissions],
+    ['se', expiry],
+  ]
+  if (protocol) params.push(['spr', protocol])
+  if (contentDisposition) params.push(['rscd', contentDisposition])
+  params.push(['sig', sig])
+  return params.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join('&')
+}
+
+function azureSignedUrl(
+  cfg: AzureBlobConfig,
+  blobName: string,
+  permissions: string,
+  expiresIn: number,
+  contentDisposition?: string
+): string {
+  const path = blobName.split('/').map(encodeURIComponent).join('/')
+  const sas = azureBlobSas(cfg, blobName, permissions, expiresIn, contentDisposition)
+  return `${cfg.endpoint}/${encodeURIComponent(cfg.container)}/${path}?${sas}`
+}
+
+async function azureFailure(operation: string, res: Response): Promise<AzureBlobRequestError> {
+  await res.body?.cancel()
+  return new AzureBlobRequestError(operation, res.status, res.headers.get('x-ms-error-code'))
+}
+
+// ============================================================================
 // Dynamic Module Loading (Lazy Singletons)
 // ============================================================================
 
@@ -508,8 +621,6 @@ export interface WorkspaceStorage {
  * its prefix, to the scope that built it.
  */
 function workspaceStorage(selfReportedWorkspaceId: WorkspaceId): WorkspaceStorage {
-  const connection = getS3Config()
-
   /**
    * Compose, then verify — in one place, before the name reaches any command.
    *
@@ -519,6 +630,11 @@ function workspaceStorage(selfReportedWorkspaceId: WorkspaceId): WorkspaceStorag
    * branch in which a command runs against the un-namespaced key.
    */
   const objectName = (key: string): string => composeNamespacedKey(selfReportedWorkspaceId, key)
+
+  const azure = getAzureBlobConfigOrNull()
+  if (azure) return azureWorkspaceStorage(selfReportedWorkspaceId, objectName, azure)
+
+  const connection = getS3Config()
 
   return {
     selfReportedWorkspaceId,
@@ -589,6 +705,75 @@ function workspaceStorage(selfReportedWorkspaceId: WorkspaceId): WorkspaceStorag
       const client = await getS3Client(connection)
       const { DeleteObjectCommand } = await getS3Module()
       await client.send(new DeleteObjectCommand({ Bucket: connection.bucket, Key }))
+    },
+  }
+}
+
+/** {@link workspaceStorage} against an Azure Blob container. */
+function azureWorkspaceStorage(
+  selfReportedWorkspaceId: WorkspaceId,
+  objectName: (key: string) => string,
+  cfg: AzureBlobConfig
+): WorkspaceStorage {
+  return {
+    selfReportedWorkspaceId,
+    namespace: workspaceNamespace(selfReportedWorkspaceId),
+    objectName,
+
+    async presignPut(key, _contentType, expiresIn) {
+      return azureSignedUrl(cfg, objectName(key), 'cw', expiresIn)
+    },
+
+    async put(key, body, contentType) {
+      const name = objectName(key)
+      const res = await fetch(azureSignedUrl(cfg, name, 'cw', AZURE_REQUEST_SAS_SECONDS), {
+        method: 'PUT',
+        headers: {
+          'x-ms-version': AZURE_SAS_VERSION,
+          'x-ms-blob-type': 'BlockBlob',
+          'x-ms-blob-content-type': contentType,
+          'Content-Type': contentType,
+        },
+        body: new Uint8Array(body),
+      })
+      if (!res.ok) throw await azureFailure('put', res)
+    },
+
+    async get(key) {
+      const name = objectName(key)
+      const res = await fetch(azureSignedUrl(cfg, name, 'r', AZURE_REQUEST_SAS_SECONDS), {
+        headers: { 'x-ms-version': AZURE_SAS_VERSION },
+      })
+      if (!res.ok) throw await azureFailure('get', res)
+      if (!res.body) throw new AzureBlobRequestError('get', 404, 'EmptyBody')
+      return {
+        body: res.body,
+        contentType: res.headers.get('content-type') || 'application/octet-stream',
+      }
+    },
+
+    async presignGet(key, expiresIn, downloadName) {
+      return azureSignedUrl(
+        cfg,
+        objectName(key),
+        'r',
+        expiresIn,
+        downloadName ? `attachment; filename="${downloadName}"` : undefined
+      )
+    },
+
+    async remove(key) {
+      const name = objectName(key)
+      const res = await fetch(azureSignedUrl(cfg, name, 'd', AZURE_REQUEST_SAS_SECONDS), {
+        method: 'DELETE',
+        headers: { 'x-ms-version': AZURE_SAS_VERSION },
+      })
+      // Deleting a missing object succeeds, as it does on S3.
+      if (res.status === 404) {
+        await res.body?.cancel()
+        return
+      }
+      if (!res.ok) throw await azureFailure('delete', res)
     },
   }
 }
