@@ -10,6 +10,7 @@ Deploy Quackback on your own infrastructure with full control over your data.
 - [Database Setup](#database-setup)
 - [Building from Source](#building-from-source)
 - [Reverse Proxy](#reverse-proxy)
+- [Support Email (Resend)](#support-email-resend)
 - [Scaling Out](#scaling-out)
 - [Enterprise Edition](#enterprise-edition)
 - [Upgrading](#upgrading)
@@ -260,6 +261,76 @@ services:
       - 'traefik.http.routers.quackback.rule=Host(`feedback.yourcompany.com`)'
       - 'traefik.http.routers.quackback.tls.certresolver=letsencrypt'
 ```
+
+---
+
+## Support Email (Resend)
+
+Email replies to support conversations and tickets come back into the same
+thread. Every email the team sends carries a signed reply address for its
+conversation or ticket; the customer's reply arrives through Resend's inbound
+webhook and is appended there, reopening a closed conversation. Mail sent to
+the plain support address opens a new conversation. No code changes are
+needed, only the configuration below.
+
+### 1. In Resend
+
+1. **Sending:** verify the domain you send from.
+2. **Receiving:** enable receiving on a domain and add the MX record Resend
+   gives you. Use a subdomain you don't otherwise receive mail on (for example
+   `support.example.com`), because every address at it is routed to Quackback.
+3. **Webhook:** add an endpoint at `<BASE_URL>/api/chat/email/inbound` for the
+   `email.received` event. Adding `email.bounced` and `email.complained` lets
+   Quackback mark addresses that bounce. Copy the endpoint's signing secret
+   (`whsec_…`).
+4. **API key:** create one with sending and receiving access.
+
+### 2. Environment
+
+```
+EMAIL_RESEND_API_KEY=re_...
+EMAIL_FROM=Support <support@example.com>
+EMAIL_INBOUND_DOMAIN=support.example.com
+EMAIL_INBOUND_SIGNING_SECRET=whsec_...
+```
+
+- `EMAIL_RESEND_API_KEY` sends mail _and_ fetches the body of every inbound
+  message: Resend's webhook carries only metadata. Without it every reply
+  arrives empty and is dropped.
+- `EMAIL_FROM` must be on the verified sending domain.
+- `EMAIL_INBOUND_DOMAIN` is the receiving domain, exactly one value. Reply
+  addresses are built on it as `reply+c…@<domain>` (conversations) and
+  `reply+t…@<domain>` (tickets); the plain support address is `reply@<domain>`.
+- Resend is used as the sender only when no `EMAIL_SMTP_HOST` and no SES
+  credentials are set.
+
+At least one of the widget messenger, portal Support or support tickets must be
+enabled, or inbound mail has nowhere to land and is acknowledged and dropped.
+After restarting, Settings → Channels → Email reports inbound as configured.
+
+### 3. Test
+
+1. From an external mailbox, email `reply@<inbound domain>`. A new conversation
+   should appear in the inbox.
+2. Reply from the inbox. The email that arrives has a `reply+c…` Reply-To.
+3. Reply to that email. It should appear in the same conversation.
+4. Repeat on a customer ticket; agent replies there carry a `reply+t…` address.
+
+### When a reply doesn't show up
+
+Every inbound message is recorded under Settings → Channels → Email → Email
+activity, including refused ones, with the reason:
+
+| Reason                          | Meaning                                                                                                                                                          |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `from_mismatch`                 | The sender isn't an address known for that customer. A reply address can be seen by anyone on the thread, so only the customer's own addresses may post into it. |
+| `empty`                         | Nothing left after quoted history was stripped, or the body couldn't be fetched (check `EMAIL_RESEND_API_KEY`).                                                  |
+| `no_conversation` / `no_ticket` | The thread was deleted, or the ticket is an internal type with no requester.                                                                                     |
+| `suppressed`                    | An autoresponder, a mail loop, or a blocked sender.                                                                                                              |
+| `rate_limited`                  | Too many messages from one person in a short time.                                                                                                               |
+
+If nothing appears there at all, the webhook isn't reaching the app: Resend's
+webhook log shows the response code, and the app logs `inbound email` warnings.
 
 ---
 
