@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SSO_OAUTH_CALLBACK_PREFIX } from '@/lib/shared/sso-test-keys'
 import { WorkspaceKeyedCache } from '@/lib/server/workspaces/workspace-keyed'
+import { getClientIp } from '@/lib/server/domains/api/rate-limit'
 
 /**
  * Simple rate limiter for OAuth client registration.
@@ -15,11 +16,7 @@ const REG_WINDOW_MS = 60 * 60 * 1000 // 1 hour
 const REG_MAX = 10
 
 export function isRegistrationRateLimited(request: Request): boolean {
-  const ip =
-    request.headers.get('cf-connecting-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
-    request.headers.get('x-real-ip') ??
-    'unknown'
+  const ip = getClientIp(request)
   const now = Date.now()
   const entry = registrationAttempts.get(ip)
 
