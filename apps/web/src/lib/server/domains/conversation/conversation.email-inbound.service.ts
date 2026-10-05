@@ -879,7 +879,13 @@ async function ingestTicketReply(
       .map((e) => e.toLowerCase())
   )
   const sender = extractEmailAddress(parsed.from)
-  if (!sender || !knownAddresses.has(sender)) {
+  // Same rule as the conversation path: an address recorded as this person's
+  // channel identity counts as theirs, not only the account and contact email.
+  const senderIsRequester =
+    !!sender &&
+    (knownAddresses.has(sender) ||
+      (await resolvePrincipalIdByEmail(sender)) === requesterPrincipalId)
+  if (!senderIsRequester) {
     log.warn({ ticketId, reason: 'sender_not_requester' }, 'inbound ticket reply dropped')
     return { status: 'from_mismatch' }
   }

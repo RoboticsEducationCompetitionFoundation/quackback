@@ -1414,6 +1414,32 @@ describe('ingestInboundEmail — ticket reply branch (D9)', () => {
     expect(ensurePlatformInboundRoute).not.toHaveBeenCalled()
   })
 
+  it("accepts a reply from another address recorded as the requester's", async () => {
+    resolvePrincipalIdByEmail.mockResolvedValueOnce('principal_req')
+    const result = await ingestInboundEmail(
+      ticketEvent({
+        from: 'jane.personal@home.example',
+        headers: [{ name: 'Message-ID', value: '<t-alias@x>' }],
+      })
+    )
+
+    expect(result).toEqual({ status: 'ingested_ticket', ticketId: TICKET_ID })
+    expect(appendInboundTicketReply).toHaveBeenCalledTimes(1)
+  })
+
+  it("still drops an address recorded as someone else's", async () => {
+    resolvePrincipalIdByEmail.mockResolvedValueOnce('principal_other')
+    const result = await ingestInboundEmail(
+      ticketEvent({
+        from: 'bob@example.com',
+        headers: [{ name: 'Message-ID', value: '<t-other@x>' }],
+      })
+    )
+
+    expect(result).toEqual({ status: 'from_mismatch' })
+    expect(appendInboundTicketReply).not.toHaveBeenCalled()
+  })
+
   it('drops when the ticket is unknown or deleted', async () => {
     loadTicketOr404.mockRejectedValue(new NotFoundError('TICKET_NOT_FOUND', 'gone'))
 
