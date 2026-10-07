@@ -15,6 +15,7 @@ import type {
 } from '@quackback/ids'
 // Note: BoardId is only used for searchShippedPosts filtering
 import { sanitizeTiptapContent } from '@/lib/server/sanitize-tiptap'
+import { isValidTypeId } from '@quackback/ids'
 import { NotFoundError } from '@/lib/shared/errors'
 import { PERMISSIONS } from '@/lib/shared/permissions'
 import { requireAuth, getOptionalAuth, policyActorFromAuth } from './auth-helpers'
@@ -214,6 +215,14 @@ export const getPublicChangelogFn = createServerFn({ method: 'GET' })
   .validator(getChangelogSchema)
   .handler(async ({ data }) => {
     log.debug({ changelog_id: data.id }, 'get public changelog')
+    // Anything that is not a changelog TypeID (e.g. a guessed /changelog/rss
+    // path) cannot name an entry: not found, without hitting the parser.
+    if (!isValidTypeId(data.id, 'changelog')) {
+      throw new NotFoundError(
+        'CHANGELOG_NOT_FOUND',
+        `Published changelog entry with ID ${data.id} not found`
+      )
+    }
     // Outer gate: a private portal must not serve changelog content to a
     // caller the portal-access resolver denies. Throw the same not-found
     // error as a genuinely missing entry — a blocked visitor sees no data
