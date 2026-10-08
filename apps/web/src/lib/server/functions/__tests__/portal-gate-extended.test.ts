@@ -93,7 +93,7 @@ const mockListPublicBoardsWithStats = vi.fn()
 const mockListPublicPostsWithVotesAndAvatars = vi.fn()
 const mockListPublicStatuses = vi.fn()
 const mockListPublicTags = vi.fn()
-const mockGetVotedPostIdsByUserId = vi.fn()
+const mockGetAllUserVotedPostIds = vi.fn()
 const mockGetPublicBoardBySlug = vi.fn()
 const mockGetPublicPostDetail = vi.fn()
 const mockListPublicPosts = vi.fn()
@@ -111,8 +111,7 @@ vi.mock('@/lib/server/domains/posts/post.public', () => ({
   listPublicPosts: (...a: unknown[]) => mockListPublicPosts(...a),
   listPublicPostsWithVotesAndAvatars: (...a: unknown[]) =>
     mockListPublicPostsWithVotesAndAvatars(...a),
-  getVotedPostIdsByUserId: (...a: unknown[]) => mockGetVotedPostIdsByUserId(...a),
-  getAllUserVotedPostIds: vi.fn(),
+  getAllUserVotedPostIds: (...a: unknown[]) => mockGetAllUserVotedPostIds(...a),
 }))
 
 vi.mock('@/lib/server/domains/posts/post.public.detail', () => ({
@@ -312,7 +311,7 @@ describe('portal.ts fetchPortalData — portal-visibility gate', () => {
     mockListPublicPostsWithVotesAndAvatars.mockResolvedValue({ items: [], hasMore: false })
     mockListPublicStatuses.mockResolvedValue([])
     mockListPublicTags.mockResolvedValue([])
-    mockGetVotedPostIdsByUserId.mockResolvedValue(new Set())
+    mockGetAllUserVotedPostIds.mockResolvedValue(new Set())
 
     const h = await loadModule(PORTAL)
     const result = (await h[FETCH_PORTAL_DATA]({ data: { sort: 'top' } })) as Record<
@@ -329,7 +328,7 @@ describe('portal.ts fetchPortalData — portal-visibility gate', () => {
     mockListPublicPostsWithVotesAndAvatars.mockResolvedValue({ items: [], hasMore: false })
     mockListPublicStatuses.mockResolvedValue([])
     mockListPublicTags.mockResolvedValue([])
-    mockGetVotedPostIdsByUserId.mockResolvedValue(new Set())
+    mockGetAllUserVotedPostIds.mockResolvedValue(new Set())
 
     const h = await loadModule(PORTAL)
     await h[FETCH_PORTAL_DATA]({ data: { sort: 'top' } })
