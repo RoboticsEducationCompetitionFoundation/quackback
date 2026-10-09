@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { generateThemeCSS, readFontSans } from '@/lib/shared/theme'
 import { resolveLocale, loadWidgetMessages } from '@/lib/shared/i18n'
 import { WidgetAuthProvider } from '@/components/widget/widget-auth-provider'
+import { WidgetNamePrompt } from '@/components/widget/widget-name-prompt'
 import { extractSessionTokenFromCookie } from '@/lib/server/functions/portal-session-token'
 import { fetchUserAvatar } from '@/lib/server/functions/portal'
 import { redactSettingsForClient } from '@/lib/shared/redact-portal-config'
@@ -216,6 +217,7 @@ function WidgetLayout() {
         }}
       />
       <Outlet />
+      <WidgetNamePrompt />
     </WidgetAuthProvider>
   )
 }

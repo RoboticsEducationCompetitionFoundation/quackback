@@ -47,11 +47,32 @@ function writeDismissed(): void {
 }
 
 export function PortalNamePrompt({ enabled }: { enabled: boolean }) {
+  return <NamePrompt enabled={enabled} />
+}
+
+interface NamePromptProps {
+  enabled: boolean
+  /**
+   * Extra request headers for the two server calls. The widget passes its
+   * Bearer session here; the portal relies on its cookie and passes nothing.
+   * Either way the same functions run, so the save and the Entra write-back
+   * behave identically on both surfaces.
+   */
+  getHeaders?: () => Record<string, string>
+  /** Cache key for the status query; the widget scopes it to its session. */
+  queryKey?: readonly unknown[]
+}
+
+export function NamePrompt({
+  enabled,
+  getHeaders,
+  queryKey = nameStatusQueryKey,
+}: NamePromptProps) {
   const intl = useIntl()
   const queryClient = useQueryClient()
   const { data } = useQuery({
-    queryKey: nameStatusQueryKey,
-    queryFn: () => getMyNameStatusFn(),
+    queryKey,
+    queryFn: () => getMyNameStatusFn(getHeaders ? { headers: getHeaders() } : undefined),
     enabled,
     staleTime: 5 * 60 * 1000,
   })
@@ -87,10 +108,10 @@ export function PortalNamePrompt({ enabled }: { enabled: boolean }) {
 
   const save = useMutation({
     mutationFn: (input: { givenName: string; familyName: string; displayName: string }) =>
-      updateMyNameFn({ data: input }),
+      updateMyNameFn({ data: input, ...(getHeaders ? { headers: getHeaders() } : {}) }),
     onSuccess: (result) => {
       toast.success(describeNameWriteBack(result.entra))
-      void queryClient.invalidateQueries({ queryKey: nameStatusQueryKey })
+      void queryClient.invalidateQueries({ queryKey })
       setOpen(false)
     },
     onError: () => {
