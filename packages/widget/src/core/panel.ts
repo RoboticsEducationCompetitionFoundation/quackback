@@ -28,6 +28,11 @@ export function createPanel(opts: PanelOptions): PanelHandle {
   if (opts.defaultBoard) params.push(`board=${encodeURIComponent(opts.defaultBoard)}`)
   if (opts.showCloseButton) params.push('showClose=1')
   if (opts.locale) params.push(`locale=${encodeURIComponent(opts.locale)}`)
+  // A cross-origin-isolated host can only frame a document that is isolated
+  // too, and isolation blocks every cross-origin image that doesn't opt in
+  // (stored images redirect to the storage provider, avatars, external
+  // embeds). So the widget asks for it only on hosts that need it.
+  if (typeof window !== 'undefined' && window.crossOriginIsolated) params.push('coep=true')
   const url = opts.widgetUrl + (params.length ? '?' + params.join('&') : '')
 
   const backdrop = document.createElement('div')

@@ -13,12 +13,20 @@ import { Button } from '@/components/ui/button'
 import { useBrandingFont } from '@/lib/client/hooks/use-branding-font'
 import { isTeamMember } from '@/lib/shared/roles'
 
-const setIframeHeaders = createServerFn({ method: 'GET' }).handler(async () => {
-  setResponseHeader('Content-Security-Policy', 'frame-ancestors *')
-  setResponseHeader('X-Frame-Options', 'ALLOWALL')
-  setResponseHeader('Cross-Origin-Resource-Policy', 'cross-origin')
-  setResponseHeader('Cross-Origin-Embedder-Policy', 'require-corp')
-})
+const setIframeHeaders = createServerFn({ method: 'GET' })
+  .validator(z.object({ isolated: z.boolean() }))
+  .handler(async ({ data }) => {
+    setResponseHeader('Content-Security-Policy', 'frame-ancestors *')
+    setResponseHeader('X-Frame-Options', 'ALLOWALL')
+    // Lets a cross-origin-isolated host load this document at all.
+    setResponseHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+    // Embedder policy only when the host is itself isolated (the SDK passes
+    // ?coep=1): an isolated parent refuses to frame a document without one,
+    // but with one the browser blocks every cross-origin image that doesn't
+    // opt in — stored images served by redirect to the storage provider,
+    // avatars, images in posts — so every other host goes without.
+    if (data.isolated) setResponseHeader('Cross-Origin-Embedder-Policy', 'require-corp')
+  })
 
 /**
  * Resolve the widget locale on the server so SSR and hydration agree.
@@ -50,8 +58,10 @@ export const Route = createFileRoute('/widget')({
   ssr: 'data-only',
   validateSearch: (
     search: Record<string, unknown>
-  ): { locale?: string; theme?: 'light' | 'dark' } => ({
+  ): { locale?: string; theme?: 'light' | 'dark'; coep?: boolean } => ({
     locale: typeof search.locale === 'string' ? search.locale : undefined,
+    // Set by the SDK when the host page is cross-origin isolated.
+    coep: search.coep === 1 || search.coep === '1' || search.coep === true ? true : undefined,
     // Forces the widget document's theme regardless of visitor preference or
     // branding themeMode. Used by the admin settings preview's Light/Dark
     // toggle; resolved in __root so it never persists to the theme cookie.
@@ -65,7 +75,10 @@ export const Route = createFileRoute('/widget')({
       throw redirect({ to: '/onboarding' })
     }
 
-    await setIframeHeaders()
+    // Read the raw value too: the loader may see the parsed-but-unvalidated
+    // search, where ?coep=1 is the number 1 rather than true.
+    const coep = (location.search as Record<string, unknown>).coep
+    await setIframeHeaders({ data: { isolated: coep === true || coep === 1 || coep === '1' } })
 
     const brandingData = settings.brandingData ?? null
     const brandingConfig = settings.brandingConfig ?? {}
