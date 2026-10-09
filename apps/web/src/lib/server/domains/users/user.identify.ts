@@ -28,6 +28,7 @@ import {
   extractExternalId,
   validateInputAttributes,
 } from './user.attributes'
+import { isPlaceholderDisplayName } from '@/lib/shared/display-name'
 
 /**
  * Identify (create or update) a portal user by email.
@@ -38,8 +39,13 @@ import {
  * Attributes must be configured in Settings > User Attributes before they can be set.
  */
 export async function identifyPortalUser(
-  input: IdentifyPortalUserInput
+  rawInput: IdentifyPortalUserInput
 ): Promise<IdentifyPortalUserResult> {
+  // Same rule as the widget's ssoToken identify: a placeholder name such as
+  // "unknown" counts as no name, so it never replaces a real one.
+  const input: IdentifyPortalUserInput = isPlaceholderDisplayName(rawInput.name)
+    ? { ...rawInput, name: undefined }
+    : rawInput
   const normalizedEmail = input.email.trim().toLowerCase()
   const defaultName = input.name || normalizedEmail.split('@')[0]
 

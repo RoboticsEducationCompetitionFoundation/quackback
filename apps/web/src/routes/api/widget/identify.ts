@@ -30,6 +30,7 @@ import { validateAndCoerceAttributes } from '@/lib/server/domains/users/user.att
 import { reconcileWidgetMemberships } from '@/lib/server/domains/segments/segment-membership.service'
 import { captureCountryFromHeaders } from '@/lib/server/auth/country-capture'
 import { logger } from '@/lib/server/logger'
+import { isPlaceholderDisplayName } from '@/lib/shared/display-name'
 
 const log = logger.child({ component: 'widget-identify' })
 
@@ -214,7 +215,14 @@ export const Route = createFileRoute('/api/widget/identify')({
         const identified: IdentifiedUser = {
           id: sub,
           email,
-          name: typeof claims.name === 'string' ? claims.name : undefined,
+          // A placeholder (Entra External ID's "unknown") is no name at all: it
+          // must not overwrite a name the person set, which would re-open the
+          // name prompt on every load, and a new account falls back to the
+          // email prefix exactly as when the host sends none.
+          name:
+            typeof claims.name === 'string' && !isPlaceholderDisplayName(claims.name)
+              ? claims.name
+              : undefined,
           avatarURL:
             typeof claims.avatarURL === 'string'
               ? claims.avatarURL

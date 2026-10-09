@@ -348,3 +348,47 @@ describe('POST /api/widget/identify — atomic metadata write', () => {
     expect(updateWithMetadata?.metadata).toBe('((coalesce(nullif(')
   })
 })
+
+describe('POST /api/widget/identify — a placeholder name never overwrites a real one', () => {
+  const customer = {
+    id: 'user_customer_sso',
+    email: 'sso@acme.com',
+    name: 'Ada Lovelace',
+    image: null,
+    imageKey: null,
+    metadata: null,
+    externalId: 'sso-user',
+  }
+
+  it('keeps the stored name when the host sends "unknown"', async () => {
+    mockVerifyJWT.mockReturnValue({ sub: 'sso-user', email: 'sso@acme.com', name: 'unknown' })
+    mockUserFindFirst.mockResolvedValue(customer)
+    mockPrincipalFindFirst.mockResolvedValue({
+      id: 'principal_customer',
+      role: 'user',
+      type: 'user',
+    })
+
+    const res = await postIdentify({ ssoToken: 'jwt.token.here' })
+
+    expect(res.status).toBe(200)
+    for (const [set] of mockUpdateSet.mock.calls) {
+      expect(set).not.toHaveProperty('name')
+    }
+  })
+
+  it('still applies a real name the host sends', async () => {
+    mockVerifyJWT.mockReturnValue({ sub: 'sso-user', email: 'sso@acme.com', name: 'Ada King' })
+    mockUserFindFirst.mockResolvedValue(customer)
+    mockPrincipalFindFirst.mockResolvedValue({
+      id: 'principal_customer',
+      role: 'user',
+      type: 'user',
+    })
+
+    const res = await postIdentify({ ssoToken: 'jwt.token.here' })
+
+    expect(res.status).toBe(200)
+    expect(mockUpdateSet).toHaveBeenCalledWith(expect.objectContaining({ name: 'Ada King' }))
+  })
+})
