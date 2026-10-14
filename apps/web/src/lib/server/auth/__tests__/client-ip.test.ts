@@ -191,6 +191,12 @@ describe('through a real Better Auth instance', () => {
     rateLimit: {
       enabled: true,
       customStorage: {
+        // Better Auth 1.6 still types the legacy get/set pair as required; the
+        // limiter never reaches them once `consume` is present.
+        async get() {
+          return null
+        },
+        async set() {},
         async consume(key: string, rule: { window: number; max: number }) {
           keys.push(key)
           const count = (counters.get(key) ?? 0) + 1

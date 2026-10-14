@@ -223,6 +223,7 @@ export async function writeMetadataKey<T>(
     return computed
   })
   await invalidateSettingsCache()
+  return next
 }
 
 /**

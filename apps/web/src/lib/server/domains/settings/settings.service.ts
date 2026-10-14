@@ -62,6 +62,7 @@ import {
   normalizeWelcomeCardInput,
   mergeWelcomeCard,
   publicWelcomeCard,
+  type SettingsRecord,
 } from './settings.helpers'
 import { withCurrentStorageReadTokens } from '@/lib/server/content/storage-read-urls'
 
