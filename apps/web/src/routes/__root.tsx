@@ -26,6 +26,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { DefaultErrorPage } from '@/components/shared/error-page'
 import { OttHandler } from '@/components/shared/ott-handler'
 import { VisitorBeacon } from '@/components/shared/visitor-beacon'
+import { CookieConsentBanner } from '@/components/shared/cookie-consent-banner'
 import { documentLocale, htmlLangDir } from '@/lib/shared/document-locale'
 import { normalizeLocale, DEFAULT_LOCALE, type SupportedLocale } from '@/lib/shared/i18n'
 
@@ -187,6 +188,7 @@ function RootComponent() {
       <OttHandler />
       <VisitorBeacon />
       <Outlet />
+      <CookieConsentBanner />
     </RootDocument>
   )
 }

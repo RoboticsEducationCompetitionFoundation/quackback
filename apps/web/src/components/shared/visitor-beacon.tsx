@@ -2,12 +2,14 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouterState } from '@tanstack/react-router'
+import { useCookieConsent } from '@/lib/client/cookie-consent'
+import { useIsPublicSurface } from './cookie-consent-banner'
 
 /**
  * Fires an anonymous pageview beacon on portal route changes (visitor
- * analytics). Honors the browser's opt-out signals,
- * restricts itself to portal routes, and dedupes re-renders of the same
- * URL. It sends no identifier — the server derives everything.
+ * analytics). Waits for the visitor's cookie consent, honors the browser's
+ * opt-out signals, restricts itself to portal routes, and dedupes re-renders
+ * of the same URL. It sends no identifier — the server derives everything.
  */
 const DEVICE_COOKIE = 'qb_device'
 
@@ -26,18 +28,18 @@ function getOrCreateDeviceId(): string | null {
 
 export function VisitorBeacon() {
   const href = useRouterState({ select: (s) => s.location.href })
-  // Public visitor-facing surfaces: the portal tree plus the standalone
-  // changelog and help-center trees (the latter also serve the subdomain).
-  const isPublicSurface = useRouterState({
-    select: (s) =>
-      s.matches.some((m) =>
-        ['/_portal', '/changelog', '/hc', '/help'].some((prefix) => m.routeId.startsWith(prefix))
-      ),
-  })
+  const isPublicSurface = useIsPublicSurface()
+  const { status: consent } = useCookieConsent()
   const lastTracked = useRef<string | null>(null)
 
   useEffect(() => {
-    if (!isPublicSurface || lastTracked.current === href) return
+    if (consent === 'deny') {
+      document.cookie = `${DEVICE_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`
+    }
+  }, [consent])
+
+  useEffect(() => {
+    if (consent !== 'allow' || !isPublicSurface || lastTracked.current === href) return
     const nav = navigator as Navigator & { globalPrivacyControl?: boolean }
     if (nav.doNotTrack === '1' || nav.globalPrivacyControl === true) return
     lastTracked.current = href
@@ -52,7 +54,7 @@ export function VisitorBeacon() {
     if (!navigator.sendBeacon?.('/api/track', body)) {
       fetch('/api/track', { method: 'POST', body, keepalive: true }).catch(() => {})
     }
-  }, [href, isPublicSurface])
+  }, [href, isPublicSurface, consent])
 
   return null
 }

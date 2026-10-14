@@ -23,6 +23,7 @@ import { useWidgetAuth } from './widget-auth-provider'
 import { useMessengerUnread } from './use-messenger-unread'
 import { useChangelogUnread } from './use-changelog-unread'
 import { useTicketStageBadge } from './use-ticket-stage-badge'
+import { LEGAL_DOCUMENTS } from '@/lib/shared/legal'
 
 import { type WidgetTab, type EnabledTabs, visibleTabsForVisitor } from './widget-nav'
 export type { WidgetTab }
@@ -435,6 +436,24 @@ export function WidgetShell({
             </motion.div>
           )}
         </AnimatePresence>
+
+        <nav
+          aria-label="Legal"
+          className="border-t border-border/20 py-1.5 px-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground"
+        >
+          {LEGAL_DOCUMENTS.map((doc) => (
+            <a
+              key={doc.slug}
+              href={`${portalOrigin ?? ''}/legal/${doc.slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={doc.title}
+              className="hover:text-foreground transition-colors"
+            >
+              {doc.shortTitle}
+            </a>
+          ))}
+        </nav>
 
         {showPoweredBy ? (
           <div className="border-t border-border/20 py-2 flex items-center justify-center">

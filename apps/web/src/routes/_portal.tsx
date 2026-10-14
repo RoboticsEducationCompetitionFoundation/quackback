@@ -19,6 +19,7 @@ import { AuthDialog } from '@/components/auth/auth-dialog'
 import { buildPortalAuthDialogConfig } from '@/components/auth/portal-auth-dialog-config'
 import { PortalAccessGate } from '@/components/portal/portal-access-gate'
 import { PortalNamePrompt } from '@/components/portal/name-prompt'
+import { LegalFooter } from '@/components/shared/legal-footer'
 import type { PortalAccessGateError } from '@/lib/shared/types/portal-gate-error'
 import { generateThemeCSS, readFontSans } from '@/lib/shared/theme'
 import { PortalIntlProvider } from '@/components/portal-intl-provider'
@@ -393,6 +394,7 @@ function PortalLayout() {
               <main className="flex-1 w-full flex flex-col">
                 <Outlet />
               </main>
+              <LegalFooter />
               <AuthDialog authConfig={authConfig} workspaceName={workspaceName} />
               {/* Asks once for a missing first/last name; see name-prompt.tsx. */}
               <PortalNamePrompt enabled={isAuthenticated && preview !== true} />
