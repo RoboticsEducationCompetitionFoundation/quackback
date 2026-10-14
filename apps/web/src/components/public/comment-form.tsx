@@ -406,7 +406,7 @@ export function CommentForm({
                 type="button"
                 size="sm"
                 disabled={isSubmitting}
-                className="h-7 text-xs"
+                className="h-9 sm:h-7 text-xs"
                 onClick={() => void form.handleSubmit(onSubmit)()}
               >
                 {isSubmitting
