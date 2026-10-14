@@ -7,9 +7,18 @@ name: Deploy Azure
 # Azure credential is stored in GitHub. Its federated credential trusts
 # `repo:<this repo>:ref:refs/heads/main`, which is why the job is limited to
 # that ref.
+#
+# Gated on CI: this runs when the `CI` workflow completes for a push to main,
+# and the job only proceeds if that run succeeded. A push whose lint, audit,
+# typecheck, unit or smoke e2e gate is red therefore never reaches the App
+# Service. The nightly scheduled CI run is excluded so it cannot redeploy an
+# already-deployed commit. `workflow_dispatch` remains as the manual override
+# for a deliberate deploy of the current main.
 
 on:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
   workflow_dispatch:
 
@@ -27,13 +36,27 @@ env:
   AZURE_WEBAPP_NAME: recf-quack-app
   ACR_LOGIN_SERVER: recfquack.azurecr.io
   IMAGE_REPOSITORY: quackback
+  # The commit CI validated. On workflow_run, github.sha is whatever main points
+  # at when this job starts, which can be a later push; deploy exactly what
+  # passed. On workflow_dispatch there is no upstream run, so it is main's HEAD.
+  DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push'
+        )
+      )
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
 
       - uses: azure/login@7184910d9eb2b1c5e48f7073824a90609bb9b6d6 # v2.3.1
         with:
@@ -49,7 +72,7 @@ jobs:
       - name: Resolve image tags
         run: |
           echo "IMAGE=${ACR_LOGIN_SERVER}/${IMAGE_REPOSITORY}" >> "$GITHUB_ENV"
-          echo "TAG=sha-${GITHUB_SHA::9}" >> "$GITHUB_ENV"
+          echo "TAG=sha-${DEPLOY_SHA::9}" >> "$GITHUB_ENV"
 
       # App Service B1 is linux/amd64 only, so a single-arch build is enough.
       # The checkout is a Linux runner, so shell scripts keep LF line endings.
