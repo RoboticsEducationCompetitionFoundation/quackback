@@ -265,10 +265,18 @@ jobs:
             exit 1
           fi
 
+  # Four shards, one Playwright worker each (see playwright.config.ts). The
+  # ~750-spec suite never finished inside the 60-minute budget on a single
+  # job; sharding files across jobs is what brings the nightly in under it.
   e2e-full:
+    name: e2e-full (${{ matrix.shard }}/4)
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     services:
       postgres:
         image: pgvector/pgvector:pg17
@@ -311,5 +319,5 @@ jobs:
           if ! timeout 90 ./node_modules/.bin/playwright install-deps chromium; then
             echo '::warning::playwright install-deps timed out or failed; continuing with browser-only install'
           fi
-      - run: ./node_modules/.bin/playwright test
+      - run: ./node_modules/.bin/playwright test --shard=${{ matrix.shard }}/4
         working-directory: apps/web

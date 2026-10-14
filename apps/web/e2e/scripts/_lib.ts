@@ -34,9 +34,16 @@ export async function bustWorkspaceSettings(sql: postgres.Sql): Promise<void> {
  * need the namespace rule (`'_'` single-workspace, the workspace id otherwise)
  * duplicated in a test helper, where getting it wrong fails as a silent no-op
  * — a cache that was never busted looks exactly like a cache that was.
+ *
+ * `IN ${sql(keys)}` rather than `= ANY(${sql.array(keys)})`: postgres.js only
+ * learns the array type OIDs after its first round-trip, so `sql.array` as the
+ * very first query on a fresh connection is sent as `text` and Postgres rejects
+ * it with "op ANY/ALL (array) requires array on right side". `bust-caches.ts`
+ * is exactly that first query.
  */
 export async function deleteCacheKeys(sql: postgres.Sql, keys: string[]): Promise<number> {
-  const rows = await sql`DELETE FROM kv_store WHERE key = ANY(${sql.array(keys)}) RETURNING key`
+  if (keys.length === 0) return 0
+  const rows = await sql`DELETE FROM kv_store WHERE key IN ${sql(keys)} RETURNING key`
   return rows.length
 }
 
