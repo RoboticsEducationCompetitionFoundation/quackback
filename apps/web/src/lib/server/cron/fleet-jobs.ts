@@ -12,6 +12,7 @@
  * would open several connections to every workspace database instead of one.
  */
 import { logger } from '@/lib/server/logger'
+import { isPooledTenancy } from '@/lib/server/workspaces/mode'
 
 const log = logger.child({ component: 'fleet-cron' })
 
@@ -161,8 +162,17 @@ export async function runStatusMaintenanceSweep(): Promise<void> {
  * body via `housekeeping` until that container is retired. The schema-state
  * lease is what stops two passes migrating one workspace; the sweep lock
  * stops two replicas from both enumerating the fleet at once.
+ *
+ * Pooled-only: the pass enumerates the workspace registry, which lives in the
+ * control database. A single-workspace install has no control database — its
+ * schema is migrated at boot — so the pass is a no-op there rather than an
+ * hourly `QUACKBACK_CONTROL_DATABASE_URL is not set` rejection.
  */
 export async function runFleetMigratorPass(): Promise<void> {
+  if (!isPooledTenancy()) {
+    log.debug('single-workspace tenancy — fleet migrator pass skipped')
+    return
+  }
   const { withSweepLock } = await import('@/lib/server/sweep-lock')
   await withSweepLock('fleet_migrator', ONE_HOUR, async () => {
     const [{ enrolActiveWorkspaces, runReconcilePass }, { hostname }, { randomUUID }] =

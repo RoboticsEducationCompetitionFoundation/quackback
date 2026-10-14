@@ -28,12 +28,14 @@ const {
   startTelemetry,
   enrolActiveWorkspaces,
   runReconcilePass,
+  tenancy,
 } = vi.hoisted(() => {
   const lockNow = { ms: 1_700_000_000_000 }
   const lockStore = new Map<string, number>()
   return {
     lockNow,
     lockStore,
+    tenancy: { pooled: true },
     sweepExpiredKv: vi.fn(),
     refreshStaleSummaries: vi.fn(),
     sweepMergeSuggestions: vi.fn(),
@@ -52,6 +54,11 @@ const {
     runReconcilePass: vi.fn(),
   }
 })
+
+vi.mock('@/lib/server/workspaces/mode', () => ({
+  isPooledTenancy: () => tenancy.pooled,
+  POOLED_TENANCY: 'pooled',
+}))
 
 vi.mock('@/lib/server/sweep-lock', () => ({
   withSweepLock: async (
@@ -124,6 +131,7 @@ function reject(label: string) {
 beforeEach(() => {
   lockNow.ms = 1_700_000_000_000
   lockStore.clear()
+  tenancy.pooled = true
   for (const fn of [
     sweepExpiredKv,
     refreshStaleSummaries,
@@ -201,6 +209,18 @@ describe('housekeeping', () => {
     expect(runReconcilePass).toHaveBeenCalledWith(
       expect.objectContaining({ concurrency: 4, leaseMs: 900_000 })
     )
+  })
+
+  it('skips the migrator stage under single-workspace tenancy instead of failing', async () => {
+    // There is no control database to enumerate, so the stage is a no-op. The
+    // same body is armed hourly on the worker; without this it rejected every
+    // tick on a single-workspace install.
+    tenancy.pooled = false
+
+    expect(await runFleetCronJob('housekeeping')).toBe(true)
+    expect(enrolActiveWorkspaces).not.toHaveBeenCalled()
+    expect(runReconcilePass).not.toHaveBeenCalled()
+    expect(sweepExpiredKv).toHaveBeenCalledOnce()
   })
 
   it('log-and-continues sweep-body failures and still succeeds when the migrator does', async () => {
