@@ -2,26 +2,27 @@
 title: Cookie Policy
 ---
 
-<!-- Adapted from counsel's draft ("COOKIE POLICY.docx", September 2026) by way of the Competition
-     Control website's Cookie Policy (c2.recf.org/legal/cookie-policy), with the site description,
-     Cookie table, and analytics category changed to describe the feedback portal at
-     quack.recf.cloud. Do not edit the legal language here without routing the change back through
-     counsel. -->
+<!-- DRAFT PENDING COUNSEL REVIEW. Adapted from counsel's draft ("COOKIE POLICY.docx",
+     September 2026) by way of the Competition Control website's Cookie Policy
+     (c2.recf.org/legal/cookie-policy), with the site description, Cookie table, and analytics
+     category changed to describe the feedback and support portal at quack.recf.org. Do not edit
+     the legal language here without routing the change back through counsel. -->
 
-# Competition Control Feedback Portal Cookie Policy
+# Competition Control Feedback and Support Portal Cookie Policy
 
 _Last updated: September 23, 2026_
 
 This Cookie Policy explains how the Robotics Education & Competition Foundation ("RECF", "we",
 "us", or "our") uses cookies, browser storage, scripts, and similar technologies (collectively,
-"Cookies") when you visit the Competition Control feedback portal at quack.recf.cloud, including
-its feedback boards, roadmap, changelog, help center, administration pages, and the feedback
-widget it provides to other RECF websites and applications (the "Site").
+"Cookies") when you visit the Competition Control feedback and support portal at quack.recf.org
+(also reachable at quack.recf.cloud), including its feedback boards, roadmap, changelog, help
+center, support messenger, status page, administration pages, and the feedback widget it
+provides to other RECF websites and applications (the "Site").
 
 This Cookie Policy does not cover the Competition Control website at c2.recf.org, which has its
-own Cookie Policy, or the Competition Control application and the devices connected to an
-event's host computer; the browser storage they use is described under "Device and browser
-storage" in our [Privacy Policy](/legal/privacy-policy).
+own Cookie Policy published at <https://c2.recf.org/legal/cookie-policy>, or the Competition
+Control application and the devices connected to an event's host computer, which are covered
+by the Competition Control Privacy Policy at <https://c2.recf.org/legal/privacy-policy>.
 
 This Cookie Policy should be read together with our [Privacy Policy](/legal/privacy-policy) and
 [Terms and Conditions](/legal/terms-of-service).
@@ -84,14 +85,14 @@ placing them.
 
 ### Cookies used on the Site
 
-| Name | Provider | Category | Purpose | Duration |
-| --- | --- | --- | --- | --- |
-| `cookieconsent_status` | RECF (quack.recf.cloud) | Strictly necessary | Remembers whether you allowed or declined non-essential Cookies. | 1 year |
-| `better-auth.*` (including `__Secure-better-auth.session_token`) | RECF (quack.recf.cloud) | Strictly necessary | Keeps you signed in and protects the sign-in process. Only set when you sign in. | Up to 7 days, or until you sign out |
-| `theme` (cookie and local storage) | RECF (quack.recf.cloud) | Functional | Remembers your light or dark appearance setting. | 1 year, or until you clear your browser storage |
-| `hc_locale` | RECF (quack.recf.cloud) | Functional | Remembers the language you choose in the help center. Only set when you choose one. | 1 year |
-| `quackback:*` (local storage) | RECF (quack.recf.cloud) | Functional | Lets the feedback widget keep your anonymous session, remember which updates you have seen, and remember display preferences. | Anonymous session: 7 days. Others: until you clear your browser storage |
-| `qb_device` | RECF (quack.recf.cloud) | Analytics | Recognizes your browser across visits so we can understand how the Site is used. Only set after you allow it. | 1 year |
+| Name                                                             | Provider              | Category           | Purpose                                                                                                                       | Duration                                                                |
+| ---------------------------------------------------------------- | --------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `cookieconsent_status`                                           | RECF (quack.recf.org) | Strictly necessary | Remembers whether you allowed or declined non-essential Cookies.                                                              | 1 year                                                                  |
+| `better-auth.*` (including `__Secure-better-auth.session_token`) | RECF (quack.recf.org) | Strictly necessary | Keeps you signed in and protects the sign-in process. Only set when you sign in.                                              | Up to 7 days, or until you sign out                                     |
+| `theme` (cookie and local storage)                               | RECF (quack.recf.org) | Functional         | Remembers your light or dark appearance setting.                                                                              | 1 year, or until you clear your browser storage                         |
+| `hc_locale`                                                      | RECF (quack.recf.org) | Functional         | Remembers the language you choose in the help center. Only set when you choose one.                                           | 1 year                                                                  |
+| `quackback:*` (local storage)                                    | RECF (quack.recf.org) | Functional         | Lets the feedback widget keep your anonymous session, remember which updates you have seen, and remember display preferences. | Anonymous session: 7 days. Others: until you clear your browser storage |
+| `qb_device`                                                      | RECF (quack.recf.org) | Analytics          | Recognizes your browser across visits so we can understand how the Site is used. Only set after you allow it.                 | 1 year                                                                  |
 
 ## 4. First-party and third-party Cookies
 
@@ -99,10 +100,11 @@ placing them.
 improve your experience. All of the Cookies listed above are first-party Cookies.
 
 **Third-party Cookies** are placed by another site. When the feedback widget is embedded in
-another website, it runs from quack.recf.cloud and its Cookies belong to the Site rather than to
-the website it appears on; that website's own Cookie policy governs its Cookies. Signing in may be
-handled by Microsoft Entra ID, which may set Cookies on Microsoft's sites under Microsoft's own
-privacy policy. We do not control Microsoft's Cookie practices.
+another website, it runs from quack.recf.org and its Cookies belong to the Site rather than to
+the website it appears on; that website's own Cookie policy governs its Cookies. If you sign in
+with a Microsoft Entra ID account, the sign-in is handled by Microsoft, which may set Cookies on
+Microsoft's sites under Microsoft's own privacy policy. We do not control Microsoft's Cookie
+practices.
 
 ## 5. Information collected through Cookies
 

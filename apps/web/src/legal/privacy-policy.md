@@ -2,217 +2,183 @@
 title: Privacy Policy
 ---
 
-<!-- This is the counsel-approved text ("Competition Control Privacy Policy.md", September 2026),
-     reproduced verbatim apart from Markdown formatting. Do not edit the legal language here
-     without routing the change back through counsel. The "AI features" subsection and the Azure
-     OpenAI Service addition under "How we share information" are draft additions pending
-     counsel review. -->
+<!-- DRAFT PENDING COUNSEL REVIEW. Adapted from the counsel-approved Competition Control
+     Privacy Policy ("Competition Control Privacy Policy.md", September 2026) for the feedback
+     and support portal at quack.recf.org. Changes from the approved text: the sections about
+     the desktop application, installation check-ins, event data, cloud event backup, and the
+     public results API were removed and replaced with sections describing the portal (accounts,
+     content you submit, usage analytics, the feedback widget, email, AI features); the
+     statements that RECF "may use third-party advertising, tracking cookies, or third-party
+     analytics services" were replaced with a description of the portal's consent-gated
+     first-party analytics; the service provider list, retention schedule, security, legal
+     bases, and California disclosures were updated to match. Do not edit the legal language
+     here without routing the change back through counsel. -->
 
-# Competition Control Privacy Policy
+# Competition Control Feedback and Support Portal Privacy Policy
 
 _Last updated: September 23, 2026_
 
 This Privacy Policy describes how the Robotics Education & Competition Foundation ("RECF",
 "we", "us") collects, uses, and shares information in connection with the Competition Control
-software, including the desktop application, the local web server it hosts, connected client
-devices, our cloud services, and the Competition Control documentation website (collectively,
-the "Service"). This Privacy Policy is incorporated by reference into the Competition
-Control End User License Agreement and Terms and Conditions.
+feedback and support portal at quack.recf.org (also reachable at quack.recf.cloud), including
+its feedback boards, roadmap, changelog, help center and documentation, support messenger and
+support tickets, status page, email notifications, and the feedback widget that the portal
+provides to other RECF websites and applications, such as the Competition Control
+documentation site at c2.recf.org and the Competition Control application (collectively, the
+"Portal"). This Privacy Policy is incorporated by reference into the Portal Terms and
+Conditions.
+
+The Competition Control application, its cloud services, and the public results API are
+covered by the separate Competition Control Privacy Policy published at
+<https://c2.recf.org/legal/privacy-policy>. The Portal does not receive event data or event
+server credentials from the Competition Control application.
 
 ## Summary
 
-- Competition event data is stored **locally on the event's host computer**. Events that
-  are linked to a registration in RECF's event registration system ("RECF Events") are
-  additionally **backed up continuously to RECF's cloud** while the host computer is
-  online. Local-only and practice events are never transmitted to RECF.
-- A Microsoft Entra ID account is required to **download the application, receive updates,
-  and launch an event from its RECF Events registration**. Running an event does not require
-  an internet connection: cloud-connected events keep working offline and resume backing up
-  when connectivity returns.
-- Event results are **private until the event organizer publishes them**. Published results
-  are available through our public results API with personal information removed.
-  Information made publicly available through the results API may be copied, indexed,
-  cached, or retained by third parties. RECF cannot control or require the deletion of
-  copies held by third parties after publication.
-- When the application checks for updates, we receive basic installation details (account
-  identifier, display name, operating system/platform, application version, release channel).
-- Feedback you submit through the feedback portal is publicly visible along with your
-  display name. Submitting feedback requires signing in.
-- We may use third-party advertising, tracking cookies, or third-party analytics services.
-- The application does not collect student names or student contact information. Student
-  initials may be recorded by event staff during robot inspection.
-- Data provided to the application from RECF Events, and event data uploaded to RECF's
-  cloud, are RECF's property; organizers keep their local copies and a right to use the
-  data for their event (see "Data ownership and organizer responsibilities" below).
-- Organizers represent and warrant that they possess all rights necessary to upload
-  materials into the Service and to grant RECF the rights described in the End User License
-  Agreement and Terms and Conditions.
+- **An account is required to submit feedback, vote, comment, or start a support
+  conversation.** You can sign in with a Microsoft Entra ID account, or with an email address
+  and a password or one-time sign-in link. We receive your name, email address, and account
+  identifier. Browsing public boards, the help center, the changelog, and the status page
+  does not require an account.
+- **Feedback posts, votes, and comments are publicly visible together with your display
+  name.** Your email address is not publicly displayed. Public content may be copied,
+  indexed, cached, or retained by third parties such as search engines, and RECF cannot
+  require the deletion of those copies.
+- **Support conversations and tickets are private** to you and to the RECF staff and
+  volunteers who provide support. They may be handled first by an AI assistant (see "AI
+  features" below).
+- **We use first-party analytics only with your consent**, and we do not use third-party
+  analytics, advertising, or cross-site tracking cookies. See our
+  [Cookie Policy](/legal/cookie-policy).
+- **We send email** about your content, posts you follow, support conversations, and your
+  account through our email service provider. You can unsubscribe from notification emails.
+- **The Portal is not directed to children under 13**, and you should not post personal
+  information about students or other minors.
+- The Portal runs on open source software ([Quackback](https://github.com/RoboticsEducationCompetitionFoundation/quackback))
+  that RECF hosts on Microsoft Azure in the United States.
 
 ## Information we collect
 
 ### Account information
 
-Downloads, updates, launching an event from its RECF Events registration, and submitting
-feedback are authenticated with a Microsoft Entra ID account. When you sign in, we receive the following
-from your identity token: your **name**, **email address**, and **username**. We do not
-collect phone numbers, and the application has no separate registration form. Account
-credentials are managed by Microsoft; we never receive your password. When you launch an
-event from RECF Events, your account identifier is used to look up the events you are
-assigned to in RECF Events.
+Submitting feedback, voting, commenting, and starting a support conversation require an
+account. If you sign in with a Microsoft Entra ID account, we receive the following from your
+identity token: your **name**, **email address**, and **username or account identifier**.
+Account credentials are managed by Microsoft; we never receive your password. If you
+register with an email address instead, we collect your **email address**, the **name** you
+provide, and, if you choose a password, your password in hashed form. You may optionally add
+a profile picture. We do not collect phone numbers.
 
-### Installation and update information
+When you use the feedback widget on another RECF website or application that has already
+signed you in, that website or application provides the Portal with your account identifier,
+name, and email address, so that your submissions are attributed to you wherever you use
+the widget.
 
-When the application checks for updates or downloads a release, we record: your account
-identifier and display name, operating system/platform, installed application version,
-release channel (stable, beta, prerelease), and the time of the check-in. We use this to
-understand which versions are in use, to distribute prerelease builds to authorized testers,
-and to support you.
+### Content you submit
 
-The Software also includes security features — release gating, device authorization, and
-account sign-in — that prevent unauthorized use. Records generated by these features (such
-as the installation details above and the device identifiers described under "Device and
-browser storage") may be used to verify compliance with the software license terms and to
-protect RECF's rights.
+We collect the content you submit to the Portal: feedback posts, votes, comments, support
+messages sent through the messenger or support tickets, emails you send to our support
+addresses, attachments and images, and the time and context (such as the board or
+conversation) of each submission. **Feedback posts, votes, and comments are publicly visible
+on the Portal together with your display name**; your email address is not publicly
+displayed. Support conversations and tickets are visible to you and to the RECF staff and
+volunteers who provide support. RECF staff may add internal notes, tags, and status
+information to your content.
 
-### Service telemetry and logs
+### Usage information and analytics
 
-Our cloud services collect aggregate operational metrics (e.g., download and update-check
-counts by platform and channel) and standard diagnostic traces through Azure Monitor /
-Application Insights. Like most web services, our infrastructure logs may include IP
-addresses and request metadata.
+With your consent, the Portal records page views to understand how it is used. For each page
+view we record the page and site visited, the referring page, the time, your browser type,
+operating system, and device type, the country derived from your network connection, and a
+random device identifier stored in your browser (`qb_device`). Your IP address and full
+browser details are used only momentarily to compute a daily-changing visitor hash, to
+filter automated traffic, and to apply rate limits, and are not stored with the page view.
+This analytics data is collected and processed by RECF on the Portal itself and is not shared
+with any third-party analytics provider. No page views are recorded, and the device
+identifier is not set, until you allow analytics through the Cookie banner, as described in
+our [Cookie Policy](/legal/cookie-policy).
 
-The local application writes diagnostic logs **to the host computer only** (rolling
-14-day retention). Local logs are not transmitted to RECF.
+### Service and security logs
 
-### Event data
+Like most web services, our infrastructure logs may include IP addresses and request
+metadata, which we use to operate, secure, and troubleshoot the Portal. We also keep records
+of sign-ins, moderation actions, and administrative changes, which may be used to verify
+compliance with the Terms and Conditions and to protect RECF's rights.
 
-Event organizers use Competition Control to run competitions. In doing so, organizers may
-enter or import data that is stored in a local database on the organizer's host computer,
-including: team numbers and names, organization names, city/region/country, team grade
-level, **coach name, coach email address, and coach phone number**, inspection records
-(inspector name, student initials, notes), match schedules, scores, rankings, awards, and
-uploaded images such as sponsor logos and slide graphics.
+### Feedback widget
 
-This data resides on the organizer's computer and on client devices connected over the local
-network. For **local-only and practice events**, it is never transmitted to RECF. For
-events linked to an RECF Events registration, it is also replicated to RECF's cloud as
-described below.
+When the feedback widget loads on another RECF website or application, it receives the
+address of the page it appears on and, where that website or application has signed you in,
+the account details described above. The widget keeps its own session in browser storage for
+the Portal's site, as described in the Cookie Policy. The widget does not receive event data
+or event server credentials from the Competition Control application.
 
-### Cloud event synchronization and backup (RECF Events-linked events)
+### Email
 
-When an organizer launches an event from its RECF Events registration:
-
-- The application retrieves the event's details, registered team list (including coach
-  contact information), divisions, and offered awards from RECF Events to pre-fill event
-  setup.
-- While the host computer is online, the event's data — including the team and coach
-  information, match schedules and scores, rankings, alliance selections, inspection
-  records, and uploaded images described above — is **continuously replicated to RECF's
-  cloud** (hosted on Microsoft Azure). This backup allows a failed host computer to be
-  recovered by restoring the event onto another machine.
-- **Coach contact information (name, email address, phone number) is encrypted at rest**
-  in the cloud and is never made available through the public results API.
-- At event finalization, award winners and the event's completion status are reported back
-  to RECF Events, where they support qualification for other events.
-
-Synchronization never blocks event operation: if the network is unavailable, the event
-continues running locally and the backup resumes when connectivity returns.
-
-### Public results API and published events
-
-Event results are private until the event organizer publishes the event. When an event is
-published, the following becomes publicly available through our results API
-(`eventapi.recf.org`): match schedules and scores, rankings, solo run scores, alliance
-selections, awards and winning teams, divisions, and team listings limited to **team
-number, team name, organization name, city/region/country, and grade level**. Published
-events also contribute to season-long public standings.
-
-The public API never exposes coach contact information, street addresses, coordinates, or
-the names of individuals. Unpublished events are excluded from the public API and from
-season standings.
-
-### Feedback
-
-The documentation site and the application's main control window include a feedback widget
-for submitting suggestions, bug reports, votes, and comments to RECF's feedback portal
-(`quack.recf.cloud`), which RECF operates. Submitting feedback requires signing in with your
-Microsoft Entra ID account. When you sign in, we provide the feedback portal with your
-account identifier, name, and email address, so that your submissions are attributed to you
-whether you use the documentation site or the application. We collect the content you
-submit. **Feedback posts, votes, and comments are publicly visible on the feedback portal
-together with your display name**; your email address is not publicly displayed. The
-feedback portal does not receive event data or event server credentials.
+We send email through our email service provider to notify you about activity on your
+content and posts you follow, replies to your support conversations, one-time sign-in links,
+and account matters. Emails you send to our support addresses are received through the same
+provider and added to your support conversation. We may record whether a notification email
+was delivered.
 
 ### AI features
 
-Certain features of the feedback portal use AI models provided through Microsoft's Azure
-OpenAI Service, as described in Section 12A of the Terms and Conditions. When you use these
-features, or when RECF staff use them to review submissions, the relevant content — such as
-your question or message, feedback posts and comments, and related help center articles — is
-sent to the Azure OpenAI Service to generate answers, summaries, translations, and
-suggestions. RECF does not use your content to train AI models, and under Microsoft's terms
-for the Azure OpenAI Service, Microsoft does not use it to train its models. AI-generated
-answers and conversations are stored with your feedback and support history and are retained
-on the same basis. Do not submit sensitive personal information, or personal information
-about students or other minors, to AI features.
+Certain features of the Portal, including the support assistant in the messenger, use AI
+models provided through Microsoft's Azure OpenAI Service, as described in Section 12A of the
+Terms and Conditions. When you use these features, or when RECF staff use them to review
+submissions, the relevant content — such as your question or message, feedback posts and
+comments, and related help center articles — is sent to the Azure OpenAI Service to generate
+answers, summaries, translations, and suggestions. RECF does not use your content to train
+AI models, and under Microsoft's terms for the Azure OpenAI Service, Microsoft does not use
+it to train its models. AI-generated answers and conversations are stored with your feedback
+and support history and are retained on the same basis. Do not submit sensitive personal
+information, or personal information about students or other minors, to AI features.
 
 ### Device and browser storage
 
-Client devices connected to a host computer store: a randomly generated device identifier
-(browser localStorage), a session token (HTTP-only cookie), and a cached session record
-(sessionStorage). These are used solely to authenticate the device with the local event
-server. The feedback widget stores its own session in browser storage for the feedback
-portal's site, to keep you signed in to the feedback portal. We may use advertising or
-cross-site tracking cookies.
+The cookies and browser storage used by the Portal and the feedback widget — to keep you
+signed in, remember your preferences and Cookie choices, and, with your consent, recognize
+your browser for analytics — are described in our [Cookie Policy](/legal/cookie-policy). We
+do not use advertising or cross-site tracking cookies.
 
-**Biometric Information.** The Service does not collect biometric identifiers or biometric
+**Biometric Information.** The Portal does not collect biometric identifiers or biometric
 information and does not require the use of facial recognition, fingerprints, voiceprints,
 retina scans, or similar technologies.
 
 ## Children's privacy
 
-Competition Control is intended for use by adult event organizers, volunteers, and coaches.
-RECF relies on event organizers to obtain any parental, guardian, school, organizational, or
-other legally required notices, consents, and authorizations relating to information entered
-into the Service regarding minors. It is not directed to children, and participants do not
-use or sign in to the Service. We do not knowingly collect personal information from
-children under the age of 13. If we learn that we have collected personal information from a
-child under 13, we will delete it; if you believe a child has provided us personal
-information, contact us at support@recf.org. Where we rely on consent to process personal
-information and the individual is under 16, we will seek the consent of a parent or legal
-guardian.
+The Portal is intended for use by adult event organizers, volunteers, coaches, and other
+adults who use or support Competition Control; under the Terms and Conditions, you must be
+18 or older to create an account. It is not directed to children, and we do not knowingly
+collect personal information from children under the age of 13. If we learn that we have
+collected personal information from a child under 13, we will delete it; if you believe a
+child has provided us personal information, contact us at support@recf.org. Where we rely on
+consent to process personal information and the individual is under 16, we will seek the
+consent of a parent or legal guardian.
 
-RECF provides the Service to event organizers, schools, teams, and other organizations. Event
-organizers are responsible for determining what information is collected and entered into
-the Service and for obtaining any parental, guardian, school, organizational, or other
-authorizations required under applicable law. RECF does not direct organizers to collect
-student information and does not require the collection of student names, birth dates, or
-student contact information to operate the Service. RECF relies on organizers to ensure
-compliance with applicable requirements relating to minors.
-
-The Service does not collect student names, student contact information, birthdates, or
-rosters. During robot inspection, event staff may optionally record **student initials** to
-document who presented the robot. For RECF Events-linked events, inspection records
-(including student initials) are part of the cloud backup, but they are never made publicly
-available, and the public results API does not expose the names or initials of any
-individual.
+RECF does not ask you to include information about students in your feedback or support
+requests, and the Terms and Conditions and Acceptable Use Policy prohibit posting personal
+information about students or other minors. If you include personal information about a
+minor in content you submit, you are responsible for having obtained any parental, guardian,
+school, organizational, or other authorizations required under applicable law, and RECF may
+remove the content.
 
 ## How we use information
 
-We use the information described above to: provide downloads and updates; authorize access
-to prerelease builds; pre-fill event setup from RECF Events registrations; back up
-RECF Events-linked events and restore them when a host computer fails; publish the results
-of events that organizers choose to publish, including season-long standings; report award
-winners and event completion to RECF Events; collect, display, and respond to feedback and
-feature requests; operate, secure, and troubleshoot the Service;
-improve the Service and develop updates; measure adoption of releases; verify compliance
-with the software license terms and enforce RECF's rights; and communicate with you about
-the Service.
+We use the information described above to: operate your account and sign you in; collect,
+display, organize, moderate, and respond to feedback, votes, and comments; provide support
+through the messenger, support tickets, and email; provide the help center, changelog,
+roadmap, and status page; provide the feedback widget to other RECF websites and
+applications; send the notifications and account emails described above; provide the AI
+features described above; understand how the Portal is used, where you have consented to
+analytics; operate, secure, and troubleshoot the Portal; improve the Portal and Competition
+Control; verify compliance with the Terms and Conditions and enforce RECF's rights; and
+communicate with you about the Portal.
 
 We may also use information to detect, investigate, prevent, and respond to fraud, security
-incidents, misuse of the Service, violations of our agreements or policies, unlawful
+incidents, misuse of the Portal, violations of our agreements or policies, unlawful
 activity, and other conduct that may affect the integrity, security, or operation of the
-Service.
+Portal.
 
 We may create aggregated, anonymized, or deidentified information that does not identify any
 particular individual. We may use and disclose such information for analytics, research,
@@ -221,59 +187,46 @@ benchmarking, reporting, service improvement, and other lawful business purposes
 ## How we share information
 
 We do not sell personal information. We share information only with service providers who
-process it on our behalf — currently Microsoft Corporation (Azure cloud hosting, Entra ID
-identity, Azure Monitor diagnostics, and the Azure OpenAI Service for AI features) — and as
-required by law.
+process it on our behalf — currently Microsoft Corporation (Azure cloud hosting and
+databases, Entra ID identity, and the Azure OpenAI Service for AI features), Resend, Inc.
+(sending and receiving email), and Amazon Web Services, Inc. (storage of uploaded files) —
+and as required by law.
 
-When an event organizer publishes an event, the results described in "Public results API
-and published events" above become publicly available to anyone using our results API,
-including third-party websites and applications built on it. Award winners and event
-completion status are shared with RECF Events, RECF's event registration system, where they
-support qualification for other events.
-
-Feedback you submit through the feedback portal, together with your display name, is
-publicly visible to anyone who visits the feedback portal.
+Feedback posts, votes, and comments you submit, together with your display name, are
+publicly visible to anyone who visits the Portal or uses the feedback widget. Support
+conversations and tickets are visible to the RECF staff and volunteers who provide support,
+and the content of a support conversation may be used to create a feedback post with your
+agreement.
 
 We may disclose or transfer information in connection with, or during negotiations of, a
 merger, acquisition, financing transaction, reorganization, bankruptcy, receivership, sale of
-assets, or other corporate transaction involving all or part of RECF or the Service.
+assets, or other corporate transaction involving all or part of RECF or the Portal.
 
-## Data ownership and organizer responsibilities
+## Your content and responsibilities
 
-Event data stored locally on the organizer's computer belongs to the organizer. Data
-provided to the application from RECF Events (event details, team and coach information,
-divisions, awards) is RECF's property; organizers may use it only to run the applicable
-event, must limit access to those who need it for the event, and are responsible for its
-proper use and protection. Event data uploaded to RECF's cloud for RECF Events-linked
-events is RECF's property; organizers keep their local copies and the right to use the
-data for their event.
-
-As the party collecting participant and coach information, the event organizer is
-responsible for obtaining any consents or providing any notices required to collect that
-information, for securing the host computer, client devices, and local network, and for
-complying with the data protection, educational privacy, and child-privacy laws that apply
-to the organizer. Under the End User License Agreement, the organizer represents that it has
-obtained all consents, notices, and authorizations required under those laws before
-providing personal information to RECF.
+Content you submit to the Portal is subject to Sections 5 and 10 of the Terms and
+Conditions. You are responsible for the content you submit, including any personal
+information about other people that it contains, and for having any consents or
+authorizations needed to include that information. Do not include personal information about
+students or other minors, or event data beyond what is necessary to describe your feedback or
+support request.
 
 ## Data retention
 
-- Local event data: retained on the organizer's computer until deleted by the organizer.
-- Cloud event backups (full event snapshots): retained for the duration of the competition
-  season (season timeframes can be found on recfevents.com or by contacting your regional
-  support manager).
-- Published results and season standings: retained indefinitely as part of the public
-  record of competition results.
-- Local diagnostic logs: 14 days (rolling).
-- Cloud diagnostic data: retained for the duration of the competition season (season
-  timeframes can be found on recfevents.com or by contacting your regional support manager).
-- Installation check-in records: retained indefinitely.
-- Feedback submissions: retained until deleted by RECF or at your request.
-- Account information: managed within Microsoft Entra ID until the account is removed.
-
-Termination of the software license does not by itself delete event data held in RECF's
-cloud; that data remains RECF's property and is retained or deleted according to the
-schedules above.
+- Account information: retained until you ask us to delete your account or RECF removes
+  it. Microsoft Entra ID account information is managed within Microsoft Entra ID until the
+  account is removed.
+- Feedback posts, votes, and comments: retained until deleted by RECF or at your request.
+  When an account is deleted, public posts and comments may be retained with the author's
+  name replaced by "Deleted user".
+- Support conversations, tickets, and attachments: retained until deleted by RECF or at your
+  request.
+- Analytics: the `qb_device` identifier expires after one year; page view records are
+  retained until deleted by RECF, and aggregate statistics that do not identify any
+  individual are retained indefinitely.
+- Service and security logs: retained for a limited period under our hosting provider's
+  standard log retention.
+- Email delivery records: retained under our email service provider's standard retention.
 
 Notwithstanding any retention schedule, RECF may retain information as necessary to comply
 with legal obligations, resolve disputes, enforce agreements, investigate misconduct, prevent
@@ -281,44 +234,39 @@ fraud, or establish, exercise, or defend legal claims.
 
 ## Security
 
-Cloud services require authenticated access over HTTPS/TLS. Release artifacts are served via
-short-lived signed URLs. Event data is synchronized using event-scoped credentials issued
-when the organizer launches the event, and traffic between our cloud systems stays on
-private networks within Microsoft Azure. Coach contact information is encrypted at rest in
-the cloud, and the public results API is served by a separate read-only service whose
-database credentials cannot read coach contact fields. The local server uses device pairing
-and role-based permissions for client devices. No method of transmission or storage is
-completely secure, and we cannot guarantee absolute security. While RECF maintains
-administrative, technical, and physical safeguards designed to protect information, no
-method of transmission over the Internet or method of electronic storage is completely
-secure. RECF cannot guarantee that unauthorized access, disclosure, loss, alteration, or
-destruction of information will never occur and disclaims any warranty that its security
-measures will be successful in all circumstances.
+The Portal is served over HTTPS/TLS. Passwords, where used, are stored in hashed form, and
+sign-in through Microsoft Entra ID is handled by Microsoft. Access to support conversations,
+administrative functions, and non-public content is limited by role-based permissions. The
+feedback widget verifies identities provided by other RECF websites and applications using a
+signed token. No method of transmission or storage is completely secure, and we cannot
+guarantee absolute security. While RECF maintains administrative, technical, and physical
+safeguards designed to protect information, no method of transmission over the Internet or
+method of electronic storage is completely secure. RECF cannot guarantee that unauthorized
+access, disclosure, loss, alteration, or destruction of information will never occur and
+disclaims any warranty that its security measures will be successful in all circumstances.
 
 ## Data controller and legal bases for processing
 
 RECF is the data controller for the personal information described in this Privacy Policy,
-including account information, installation and update records, service telemetry, and event
-data replicated to RECF's cloud. For event data held on the organizer's own host computer
-and client devices, the event organizer determines what information is collected and entered
-and is responsible for that information as described under "Data ownership and organizer
-responsibilities" above.
+including account information, the content you submit, usage and analytics information, and
+service and security logs.
 
 We only collect and use personal information where we have a legal basis to do so:
 
-- **Performance of a contract** — to provide the downloads, updates, cloud backup, and other
-  features you request under the End User License Agreement and the Terms and Conditions.
-- **Our legitimate interests** — to operate, secure, troubleshoot, and improve the Service,
-  to measure adoption of releases, to publish competition results, and to verify compliance
-  with our license terms and protect our legal rights.
-- **Consent** — where we ask for it for a specific purpose. You may withdraw consent at any
-  time, which will not affect processing that has already taken place.
+- **Performance of a contract** — to provide the account, feedback, support, notification,
+  and other features you request under the Terms and Conditions.
+- **Our legitimate interests** — to operate, secure, troubleshoot, and improve the Portal,
+  to moderate content, to respond to feedback and support requests, and to verify compliance
+  with the Terms and Conditions and protect our legal rights.
+- **Consent** — where we ask for it for a specific purpose, such as analytics cookies. You
+  may withdraw consent at any time, which will not affect processing that has already taken
+  place.
 - **Compliance with law** — where we have a legal obligation to use or retain information,
   such as court orders, investigations, or regulatory obligations.
 
 ### International transfers
 
-The Service is hosted in the United States. Where personal information is transferred from
+The Portal is hosted in the United States. Where personal information is transferred from
 the European Economic Area, the United Kingdom, or Switzerland to a country that has not been
 found to provide an adequate level of protection, we rely on appropriate safeguards, such as
 the standard contractual clauses approved by the European Commission.
@@ -333,35 +281,32 @@ request information from you to verify your identity.
 - **Correction** — ask us to correct information that is inaccurate, out of date, incomplete,
   or misleading.
 - **Deletion** — ask us to delete personal information we hold about you. We will tell you
-  how deletion affects your use of the Service, and there may be exceptions where we are
-  required or permitted to retain information. Results already published through our public
-  results API may remain in copies held by third parties.
+  how deletion affects your use of the Portal, and there may be exceptions where we are
+  required or permitted to retain information. Content you have posted publicly may remain
+  in copies held by third parties, such as search engines.
 - **Portability** — request a copy of the personal information you provided to us in a
   commonly used, machine-readable format, or ask us to transfer it to a third party.
 - **Restriction** — ask us to restrict processing while we consider a question you have
   raised about the accuracy or lawfulness of our processing, or your objection to it.
 - **Objection** — object to processing that we carry out on the basis of our legitimate
   interests.
-- **Non-discrimination** — we will not deny you the Service, or provide a different level or
-  quality of the Service, because you exercised any of these rights.
+- **Non-discrimination** — we will not deny you the Portal, or provide a different level or
+  quality of the Portal, because you exercised any of these rights.
 - **Complaints** — if you believe we have breached a data protection law that applies to us,
   contact us with the details and we will investigate and respond in writing. You may also
   contact your local data protection authority or other regulator.
 
-Providing personal information to us is your choice, but some features of the Service cannot
+You can also edit your profile, manage your email notification preferences, and delete your
+own posts and comments (where the Portal's settings allow it) from within the Portal, and
+change your Cookie choices at any time using the Cookie Settings link.
+
+Providing personal information to us is your choice, but some features of the Portal cannot
 be provided without it. If a third party provides us personal information about someone
 else, that party represents that it has the consent necessary to do so.
 
 If we deny a request to exercise a privacy right, you may appeal our decision by contacting
 us at support@recf.org. We will review and respond to your appeal in accordance with
 applicable law.
-
-**Locally Stored Information.** Certain information processed through the Service may be
-stored solely on an event organizer's local systems and may not be transmitted to or
-accessible by RECF. Where RECF does not possess or control such information, RECF may be
-unable to respond directly to requests regarding access, correction, deletion, or
-portability of that information. In such circumstances, individuals should contact the
-applicable event organizer or organization that maintains the information.
 
 ### Notification of data breaches
 
@@ -378,21 +323,25 @@ Privacy Policy.
 
 ## Limits of this policy
 
-The Service links to external sites and resources that we do not operate, including RECF's
-general website, the REC Library knowledge base, and the project pages of the open source
-components listed in our acknowledgements. We have no control over the content or privacy
-practices of those sites and cannot accept responsibility or liability for them.
+The Portal links to external sites and resources that we do not operate, including RECF's
+general website, the Competition Control website, the REC Library knowledge base, the source
+code repositories of the software that runs the Portal, and links posted by other users. We
+have no control over the content or privacy practices of those sites and cannot accept
+responsibility or liability for them. Where the feedback widget is embedded in another RECF
+website or application, that website or application's own privacy policy governs the
+information it collects.
 
 ## Do Not Track
 
-Some browsers offer a "Do Not Track" setting. We may use advertising or cross-site
-tracking cookies, and at this time we do not respond to browser "Do Not Track" signals.
+Some browsers offer a "Do Not Track" setting. We do not use advertising or cross-site
+tracking cookies, and our analytics cookies are placed only with your consent, as described
+in our [Cookie Policy](/legal/cookie-policy). At this time we do not respond to browser "Do
+Not Track" signals.
 
 ## Changes to this policy
 
 We may update this Privacy Policy from time to time. We will post the revised policy with an
-updated "Last updated" date, and material changes will be highlighted in the application or
-on this site.
+updated "Last updated" date, and material changes will be highlighted on the Portal.
 
 ## Additional disclosures for the European Economic Area and the United Kingdom
 
@@ -414,12 +363,13 @@ line of your message.
 In the preceding 12 months we have collected the following categories of personal information
 enumerated in the California Consumer Privacy Act: identifiers (such as name, email address,
 username, account identifier, and device identifiers); internet or other electronic network
-activity information (such as update check-ins and diagnostic logs); content you submit
-(such as feedback posts, votes, and comments); and, for event
-organizers and coaches, contact information (such as email address and phone number). The
-sources, purposes, and recipients are described in "Information we collect", "How we use
-information", and "How we share information" above. We do not sell personal information, and
-we do not offer financial incentives for its collection.
+activity information (such as page views collected with your consent, and service and
+security logs); content you submit (such as feedback posts, votes, comments, support
+messages, and attachments); and approximate location (the country derived from your network
+connection). The sources, purposes, and recipients are described in "Information we
+collect", "How we use information", and "How we share information" above. We do not sell or
+share personal information for cross-context behavioral advertising, and we do not offer
+financial incentives for its collection.
 
 If you are a California resident, you have the right to request the categories of personal
 information we have collected about you, the categories of sources it came from, the business
