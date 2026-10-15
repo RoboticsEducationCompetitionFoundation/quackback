@@ -43,7 +43,7 @@ export interface InviteBranding {
 }
 
 const DEFAULT_BRANDING: InviteBranding = {
-  workspaceName: 'Quackback',
+  workspaceName: 'RECF',
   logoUrl: null,
   inviterName: null,
 }

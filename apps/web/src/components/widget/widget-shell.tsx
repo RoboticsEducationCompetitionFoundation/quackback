@@ -75,7 +75,6 @@ interface PortalAccessProps {
 }
 
 interface WidgetShellProps {
-  orgSlug: string
   activeTab: WidgetTab
   onTabChange: (tab: WidgetTab) => void
   onBack?: () => void
@@ -108,13 +107,10 @@ interface WidgetShellProps {
   /** Manual panel-size control beside the close button (expandable views on
    *  desktop hosts only). Collapsing is sticky — it turns auto-expansion off. */
   expandControl?: { expanded: boolean; onToggle: () => void }
-  /** Self-hosted always shows the badge. Cloud hides it only after purchase. */
-  showPoweredBy?: boolean
   children: ReactNode
 }
 
 export function WidgetShell({
-  orgSlug,
   activeTab,
   onTabChange,
   onBack,
@@ -128,7 +124,6 @@ export function WidgetShell({
   hideTabBar = false,
   panelExpanded = false,
   expandControl,
-  showPoweredBy = true,
   children,
 }: WidgetShellProps) {
   const intl = useIntl()
@@ -454,31 +449,6 @@ export function WidgetShell({
             </a>
           ))}
         </nav>
-
-        {showPoweredBy ? (
-          <div className="border-t border-border/20 py-2 flex items-center justify-center">
-            <a
-              href={`https://quackback.io?utm_campaign=${encodeURIComponent(orgSlug || 'unknown')}&utm_content=widget&utm_medium=referral&utm_source=powered-by`}
-              target="_blank"
-              className="group inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-all"
-            >
-              <img
-                src="/logo.png"
-                alt=""
-                width={11}
-                height={11}
-                className="opacity-60 group-hover:opacity-100 transition-opacity"
-              />
-              <span>
-                <FormattedMessage
-                  id="widget.shell.poweredBy"
-                  defaultMessage="Powered by {brand}"
-                  values={{ brand: <span className="font-medium">Quackback</span> }}
-                />
-              </span>
-            </a>
-          </div>
-        ) : null}
       </div>
     </div>
   )

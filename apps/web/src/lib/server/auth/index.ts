@@ -854,7 +854,7 @@ async function createAuth() {
       // No UI yet — surfaced in user profile + sign-in challenge in
       // subsequent tasks.
       twoFactor({
-        issuer: 'Quackback',
+        issuer: 'RECF',
         totpOptions: {
           period: 30,
           digits: 6,

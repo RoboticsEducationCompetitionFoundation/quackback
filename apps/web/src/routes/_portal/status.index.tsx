@@ -31,7 +31,7 @@ export const Route = createFileRoute('/_portal/status/')({
       throw notFound()
     }
     return {
-      workspaceName: context.settings?.name ?? 'Quackback',
+      workspaceName: context.settings?.name ?? 'RECF',
       baseUrl: context.baseUrl ?? '',
     }
   },

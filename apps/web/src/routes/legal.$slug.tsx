@@ -14,7 +14,7 @@ export const Route = createFileRoute('/legal/$slug')({
     return {
       slug: params.slug,
       content: content as JSONContent,
-      workspaceName: context.settings?.name ?? 'Quackback',
+      workspaceName: context.settings?.name ?? 'RECF',
     }
   },
   head: ({ loaderData }) => ({

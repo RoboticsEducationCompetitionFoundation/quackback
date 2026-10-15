@@ -34,7 +34,7 @@ export const Route = createFileRoute('/_portal/status/$incidentId')({
     return {
       incidentId,
       incidentTitle: incident.title,
-      workspaceName: context.settings?.name ?? 'Quackback',
+      workspaceName: context.settings?.name ?? 'RECF',
       baseUrl: context.baseUrl ?? '',
     }
   },

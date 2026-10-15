@@ -92,7 +92,7 @@ export function createConnectorOAuthProvider(
     },
     get clientMetadata() {
       return {
-        client_name: 'Quackback',
+        client_name: 'RECF',
         redirect_uris: [callback],
         grant_types: ['authorization_code', 'refresh_token'],
         response_types: ['code'],

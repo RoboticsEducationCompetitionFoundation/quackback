@@ -1,11 +1,12 @@
 /**
- * Shared email styles for Quackback emails
+ * Shared email styles
  *
  * Ensures consistent branding across all email templates.
  * Colors are derived from the app's design system.
  */
 
-export const DEFAULT_LOGO_URL = 'https://quackback.io/logo.png'
+// Bracket access so Vite does not inline the value at build time.
+export const DEFAULT_LOGO_URL = `${(process.env['BASE_URL'] ?? '').replace(/\/$/, '')}/logo.png`
 
 // Brand colors (converted from oklch to hex for email compatibility)
 export const colors = {

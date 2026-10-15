@@ -34,7 +34,6 @@ import type { PostId, PostStatusId } from '@quackback/ids'
 
 interface FeedbackContainerProps {
   workspaceName: string
-  workspaceSlug: string
   boards: PublicBoardWithStats[]
   posts: PublicPostListItem[]
   statuses: PostStatusEntity[]
@@ -53,12 +52,10 @@ interface FeedbackContainerProps {
    * every card — including infinite-scroll pages — and the submit CTA.
    */
   boardPermissions?: Record<string, { canSubmit: boolean; canVote: boolean }>
-  showPoweredBy?: boolean
 }
 
 export function FeedbackContainer({
   workspaceName,
-  workspaceSlug,
   boards,
   posts: initialPosts,
   statuses,
@@ -71,7 +68,6 @@ export function FeedbackContainer({
   defaultBoardId,
   user,
   boardPermissions,
-  showPoweredBy = true,
 }: FeedbackContainerProps): React.ReactElement {
   const intl = useIntl()
   const router = useRouter()
@@ -457,8 +453,6 @@ export function FeedbackContainer({
           boards={boards}
           currentBoard={activeBoard}
           onBoardChange={handleBoardChange}
-          workspaceSlug={workspaceSlug}
-          showPoweredBy={showPoweredBy}
         />
       </div>
     </div>

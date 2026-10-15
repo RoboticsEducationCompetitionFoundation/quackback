@@ -60,10 +60,7 @@ import type { IncidentImpact } from './templates/status-incident-published'
 import { StatusMaintenanceScheduledEmail } from './templates/status-maintenance-scheduled'
 import { CsatRequestEmail } from './templates/csat-request'
 import { VerifyAddressEmail } from './templates/verify-address'
-export { setEmailPoweredByResolver } from './powered-by'
 export { setDefaultFromResolver, resetDefaultFromResolver } from './default-from'
-import { createElement } from 'react'
-import { EmailPoweredByProvider, resolveEmailPoweredBy } from './powered-by'
 import { resolvedDefaultFrom } from './default-from'
 
 /**
@@ -606,14 +603,7 @@ async function sendEmail(
     postId?: string | null
   } & ThreadingOptions
 ): Promise<EmailResult> {
-  const showPoweredBy = await resolveEmailPoweredBy()
-  return dispatch({
-    ...options,
-    react: createElement(EmailPoweredByProvider, {
-      value: showPoweredBy,
-      children: options.react,
-    }),
-  })
+  return dispatch(options)
 }
 
 /** A prerendered, custom-From email (no template). */
