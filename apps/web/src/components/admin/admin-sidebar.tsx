@@ -219,10 +219,10 @@ export function AdminSidebar({ initialUserData, latestVersion }: AdminSidebarPro
 
   const flags = settings?.featureFlags as FeatureFlags | undefined
   // The org's own logo (resolved in brandingData by the root loader, same source
-  // PortalBrandMark uses); fall back to the Quackback mark when none is set.
+  // PortalBrandMark uses); fall back to the bundled RECF mark when none is set.
   const branding = (settings as { brandingData?: SettingsBrandingData } | undefined)?.brandingData
   const orgLogo = branding?.logoUrl ?? branding?.headerLogoUrl ?? '/logo.png'
-  const orgName = branding?.name ?? 'Quackback'
+  const orgName = branding?.name ?? 'RECF'
 
   const filteredNavItems = navItems.filter((item) => {
     if (item.product && !isProductEnabled(flags, item.product)) return false

@@ -460,15 +460,6 @@ export const MODULE_STATE_LEDGER: readonly LedgerEntry[] = [
       'secret: the key id names a principal, the secret is never part of it.',
   },
   {
-    file: 'packages/email/src/powered-by.ts',
-    name: 'resolver',
-    category: 'process-lifetime',
-    reason:
-      'Holds a function pointer installed at boot. Each send awaits it, and the function reads ' +
-      'live workspace cloud config through the scoped db Proxy, so sharing the pointer is not a ' +
-      'cross-workspace cache.',
-  },
-  {
     file: 'packages/email/src/default-from.ts',
     name: 'resolver',
     category: 'process-lifetime',

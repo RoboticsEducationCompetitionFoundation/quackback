@@ -6,12 +6,29 @@
  * patch + popstate/hashchange), deduped on the href actually changing so
  * frameworks that call replaceState repeatedly (scroll restoration and the
  * like) count a page once. Enabled only when the instance's server config
- * says so; honors DNT/GPC; never throws into the host page.
+ * says so and the host page's cookie banner has been accepted; honors DNT/GPC;
+ * never throws into the host page.
  */
 
 export interface Tracker {
   start(): void
   stop(): void
+}
+
+/** Same cookie the portal's own banner and the Competition Control website set. */
+const CONSENT_COOKIE_NAME = 'cookieconsent_status'
+
+/**
+ * Whether the host page's visitor has allowed non-essential cookies. The widget
+ * is embedded on RECF sites that run the same consent banner, so it defers to
+ * that choice rather than showing a second banner; no cookie means no consent.
+ */
+export function hasHostCookieConsent(): boolean {
+  try {
+    return new RegExp(`(?:^|;\\s*)${CONSENT_COOKIE_NAME}=allow(?:;|$)`).test(document.cookie)
+  } catch {
+    return false
+  }
 }
 
 export function createTracker(instanceUrl: string, deviceId: string | null = null): Tracker {
@@ -27,7 +44,9 @@ export function createTracker(instanceUrl: string, deviceId: string | null = nul
     (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true
 
   function send(): void {
-    if (!active) return
+    // Re-checked per pageview: the host banner may have withdrawn consent
+    // (in this tab or another) after start().
+    if (!active || !hasHostCookieConsent()) return
     const href = window.location.href
     if (href === lastHref) return
     lastHref = href
@@ -50,7 +69,7 @@ export function createTracker(instanceUrl: string, deviceId: string | null = nul
 
   return {
     start() {
-      if (active || optedOut()) return
+      if (active || optedOut() || !hasHostCookieConsent()) return
       active = true
 
       const h = window.history

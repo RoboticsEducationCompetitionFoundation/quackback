@@ -544,9 +544,9 @@ function AddOnsCard(props: {
       <div className="overflow-hidden rounded-xl border border-border/50 bg-card">
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
-            <div className="text-[13px] font-medium">Remove Quackback branding</div>
+            <div className="text-[13px] font-medium">Remove platform branding</div>
             <div className="text-[12px] text-muted-foreground">
-              Hide &quot;Powered by Quackback&quot; on the portal, widget, and emails. {price}.
+              Hides platform branding on the portal, widget, and emails. {price}.
             </div>
           </div>
           {props.hideBranding ? (

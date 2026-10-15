@@ -26,6 +26,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { DefaultErrorPage } from '@/components/shared/error-page'
 import { OttHandler } from '@/components/shared/ott-handler'
 import { VisitorBeacon } from '@/components/shared/visitor-beacon'
+import { CookieConsentBanner } from '@/components/shared/cookie-consent-banner'
 import { documentLocale, htmlLangDir } from '@/lib/shared/document-locale'
 import { normalizeLocale, DEFAULT_LOCALE, type SupportedLocale } from '@/lib/shared/i18n'
 
@@ -145,11 +146,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         content: 'width=device-width, initial-scale=1, viewport-fit=cover',
       },
       {
-        title: 'Quackback',
+        title: 'RECF',
       },
       {
         name: 'description',
-        content: 'Open-source customer feedback platform',
+        content: 'RECF feedback and support portal',
       },
       {
         property: 'og:type',
@@ -187,6 +188,7 @@ function RootComponent() {
       <OttHandler />
       <VisitorBeacon />
       <Outlet />
+      <CookieConsentBanner />
     </RootDocument>
   )
 }
@@ -205,7 +207,7 @@ function MinimalDocument({ children }: Readonly<{ children: ReactNode }>) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Quackback</title>
+        <title>RECF</title>
         <HeadContent />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased">{children}</body>

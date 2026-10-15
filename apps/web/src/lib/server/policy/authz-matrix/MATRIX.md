@@ -1055,6 +1055,7 @@ Each is expected to be intentionally public, a pre-auth flow, a signature-verifi
 | `lib/server/functions/invitations.ts`::getInvitationDetailsFn | server-fn |
 | `lib/server/functions/invitations.ts`::getInviteBrandingFn | server-fn |
 | `lib/server/functions/invitations.ts`::setPasswordFn | server-fn |
+| `lib/server/functions/legal.ts`::getLegalDocumentFn | server-fn |
 | `lib/server/functions/locale.ts`::getPortalLocaleFn | server-fn |
 | `lib/server/functions/onboarding.ts`::getWorkspaceClaimFn | server-fn |
 | `lib/server/functions/onboarding.ts`::saveCloudOnboardingGoalFn | server-fn |
@@ -1081,7 +1082,6 @@ Each is expected to be intentionally public, a pre-auth flow, a signature-verifi
 | `lib/server/functions/portal.ts`::getCommentsSectionDataFn | server-fn |
 | `lib/server/functions/portal.ts`::getPrincipalIdForUser | server-fn |
 | `lib/server/functions/post-merge.ts`::getPostMergeInfoFn | server-fn |
-| `lib/server/functions/powered-by.ts`::getShowPoweredByFn | server-fn |
 | `lib/server/functions/profile-name.ts`::getMyNameStatusFn | server-fn |
 | `lib/server/functions/profile-name.ts`::updateMyNameFn | server-fn |
 | `lib/server/functions/public-cache.ts`::setPublicDocumentCacheHeaders | server-fn |

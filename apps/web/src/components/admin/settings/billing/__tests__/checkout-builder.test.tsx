@@ -195,7 +195,7 @@ describe('CheckoutBuilder', () => {
 
   it('adds branding removal to the same checkout when ticked', () => {
     const { onChange } = renderBuilder(freeOverview)
-    expect(screen.getByText('Remove Quackback branding')).toBeInTheDocument()
+    expect(screen.getByText('Remove platform branding')).toBeInTheDocument()
     expect(screen.getByText('$590/yr')).toBeInTheDocument()
     expect(checkoutForm()?.querySelector('input[name="brandingRemoval"]')).toBeNull()
 

@@ -23,7 +23,7 @@ async function loadBuiltinConnector(): Promise<BuiltinConnectorDTO> {
   const specs = await resolveToolSpecs()
   return {
     id: 'quackback',
-    name: 'Quackback',
+    name: 'Portal',
     builtin: true,
     tools: specs
       .filter((spec) => spec.risk !== 'control')

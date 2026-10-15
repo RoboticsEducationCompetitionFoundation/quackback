@@ -94,7 +94,7 @@ function InvitationVerifyPage({
   useEffect(() => {
     getInviteBrandingFn({ data: invitationId })
       .then(setBranding)
-      .catch(() => setBranding({ workspaceName: 'Quackback', logoUrl: null, inviterName: null }))
+      .catch(() => setBranding({ workspaceName: 'RECF', logoUrl: null, inviterName: null }))
   }, [invitationId])
 
   function handleAccept() {

@@ -14,12 +14,14 @@ beforeEach(() => {
   sendBeacon = vi.fn().mockReturnValue(true)
   Object.defineProperty(navigator, 'sendBeacon', { value: sendBeacon, configurable: true })
   Object.defineProperty(navigator, 'doNotTrack', { value: null, configurable: true })
+  document.cookie = 'cookieconsent_status=allow;path=/'
   window.history.replaceState({}, '', '/start')
 })
 
 afterEach(() => {
   tracker?.stop()
   tracker = null
+  document.cookie = 'cookieconsent_status=;path=/;max-age=0'
 })
 
 describe('createTracker', () => {
@@ -63,6 +65,35 @@ describe('createTracker', () => {
     tracker.start()
     window.history.pushState({}, '', '/dnt-page')
     expect(sendBeacon).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when the host page has no cookie consent', () => {
+    document.cookie = 'cookieconsent_status=;path=/;max-age=0'
+    tracker = createTracker(INSTANCE)
+    tracker.start()
+    window.history.pushState({}, '', '/no-consent')
+    expect(sendBeacon).not.toHaveBeenCalled()
+  })
+
+  it('does nothing when the host page declined cookies', () => {
+    document.cookie = 'cookieconsent_status=deny;path=/'
+    tracker = createTracker(INSTANCE)
+    tracker.start()
+    expect(sendBeacon).not.toHaveBeenCalled()
+  })
+
+  it('stops sending once consent is withdrawn after start', () => {
+    tracker = createTracker(INSTANCE)
+    tracker.start()
+    expect(sendBeacon).toHaveBeenCalledTimes(1)
+
+    document.cookie = 'cookieconsent_status=deny;path=/'
+    window.history.pushState({}, '', '/after-withdrawal')
+    expect(sendBeacon).toHaveBeenCalledTimes(1)
+
+    document.cookie = 'cookieconsent_status=allow;path=/'
+    window.history.pushState({}, '', '/after-reallow')
+    expect(sendBeacon).toHaveBeenCalledTimes(2)
   })
 
   it('includes the device id on every beacon when provided', () => {

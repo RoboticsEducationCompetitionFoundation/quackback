@@ -23,6 +23,7 @@ import { useWidgetAuth } from './widget-auth-provider'
 import { useMessengerUnread } from './use-messenger-unread'
 import { useChangelogUnread } from './use-changelog-unread'
 import { useTicketStageBadge } from './use-ticket-stage-badge'
+import { LEGAL_DOCUMENTS } from '@/lib/shared/legal'
 
 import { type WidgetTab, type EnabledTabs, visibleTabsForVisitor } from './widget-nav'
 export type { WidgetTab }
@@ -74,7 +75,6 @@ interface PortalAccessProps {
 }
 
 interface WidgetShellProps {
-  orgSlug: string
   activeTab: WidgetTab
   onTabChange: (tab: WidgetTab) => void
   onBack?: () => void
@@ -107,13 +107,10 @@ interface WidgetShellProps {
   /** Manual panel-size control beside the close button (expandable views on
    *  desktop hosts only). Collapsing is sticky — it turns auto-expansion off. */
   expandControl?: { expanded: boolean; onToggle: () => void }
-  /** Self-hosted always shows the badge. Cloud hides it only after purchase. */
-  showPoweredBy?: boolean
   children: ReactNode
 }
 
 export function WidgetShell({
-  orgSlug,
   activeTab,
   onTabChange,
   onBack,
@@ -127,7 +124,6 @@ export function WidgetShell({
   hideTabBar = false,
   panelExpanded = false,
   expandControl,
-  showPoweredBy = true,
   children,
 }: WidgetShellProps) {
   const intl = useIntl()
@@ -436,30 +432,23 @@ export function WidgetShell({
           )}
         </AnimatePresence>
 
-        {showPoweredBy ? (
-          <div className="border-t border-border/20 py-2 flex items-center justify-center">
+        <nav
+          aria-label="Legal"
+          className="border-t border-border/20 py-1.5 px-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground"
+        >
+          {LEGAL_DOCUMENTS.map((doc) => (
             <a
-              href={`https://quackback.io?utm_campaign=${encodeURIComponent(orgSlug || 'unknown')}&utm_content=widget&utm_medium=referral&utm_source=powered-by`}
+              key={doc.slug}
+              href={`${portalOrigin ?? ''}/legal/${doc.slug}`}
               target="_blank"
-              className="group inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-all"
+              rel="noopener noreferrer"
+              title={doc.title}
+              className="hover:text-foreground transition-colors"
             >
-              <img
-                src="/logo.png"
-                alt=""
-                width={11}
-                height={11}
-                className="opacity-60 group-hover:opacity-100 transition-opacity"
-              />
-              <span>
-                <FormattedMessage
-                  id="widget.shell.poweredBy"
-                  defaultMessage="Powered by {brand}"
-                  values={{ brand: <span className="font-medium">Quackback</span> }}
-                />
-              </span>
+              {doc.shortTitle}
             </a>
-          </div>
-        ) : null}
+          ))}
+        </nav>
       </div>
     </div>
   )

@@ -152,7 +152,7 @@ describe('BillingPlansView', () => {
     expect(screen.getByText('1,840 of 10,000')).toBeInTheDocument()
     expect(screen.getAllByRole('button', { name: 'Top up' })).toHaveLength(2)
     expect(screen.getByRole('heading', { name: 'Add-ons' })).toBeInTheDocument()
-    expect(screen.getByText('Remove Quackback branding')).toBeInTheDocument()
+    expect(screen.getByText('Remove platform branding')).toBeInTheDocument()
     const addBranding = screen.getByRole('button', { name: 'Add' })
     expect(addBranding).toBeEnabled()
     const brandingForm = addBranding.closest('form')

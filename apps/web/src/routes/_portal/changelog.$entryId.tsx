@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_portal/changelog/$entryId')({
     return {
       entryId,
       entryTitle: entry.title,
-      workspaceName: context.settings?.name ?? 'Quackback',
+      workspaceName: context.settings?.name ?? 'RECF',
       baseUrl: context.baseUrl ?? '',
     }
   },

@@ -51,7 +51,7 @@ export function trialEndedNotice(
   }
   const actionUrl = plansActionUrl(config)
   const name = options.trialPlanName
-  const product = name ?? 'Quackback'
+  const product = name ?? 'the portal'
   return {
     label: name ? `${name} trial ended` : 'Trial ended',
     message: `Your trial has come to an end. Please update your billing information to continue using ${product}.`,
