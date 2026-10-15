@@ -26,6 +26,7 @@ import {
   unpinComment,
 } from '@/lib/server/domains/comments/comment.pin'
 import { NotFoundError } from '@/lib/shared/errors'
+import { isReactionEmoji, REACTION_EMOJI_MESSAGE } from '@/lib/shared/reaction-emoji'
 import { getOptionalAuth, requireAuth, hasAuthCredentials } from './auth-helpers'
 
 const log = logger.child({ component: 'comments' })
@@ -40,9 +41,15 @@ const createCommentSchema = z.object({
   isPrivate: z.boolean().optional(),
 })
 
+/** Removing a reaction accepts any stored value, so older rows can be cleared. */
 const reactionSchema = z.object({
   commentId: z.string(),
   emoji: z.string(),
+})
+
+/** Adding one takes a single emoji, never free text. */
+const addReactionSchema = reactionSchema.extend({
+  emoji: z.string().refine(isReactionEmoji, REACTION_EMOJI_MESSAGE),
 })
 
 const getCommentPermissionsSchema = z.object({
@@ -140,7 +147,7 @@ export const createCommentFn = createServerFn({ method: 'POST' })
   })
 
 export const addReactionFn = createServerFn({ method: 'POST' })
-  .validator(reactionSchema)
+  .validator(addReactionSchema)
   .handler(async ({ data }) => {
     log.info({ comment_id: data.commentId, emoji: data.emoji }, 'add reaction')
     // Portal-visibility gate — mirror createCommentFn / toggleVoteFn.

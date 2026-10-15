@@ -66,8 +66,8 @@ export async function createComment(
   }
   const board = post.board
 
-  // Enforce access-control policy: board audience + post visibility + comments-locked.
-  // Workspace moderation default is the fallback for board-level `inherit`.
+  // Enforce access-control policy: board audience + post visibility + comments-locked
+  // + merged. Workspace moderation default is the fallback for board-level `inherit`.
   const portalConfig = await getPortalConfig()
   const decision = canCreateComment(
     actor,
@@ -75,6 +75,7 @@ export async function createComment(
       moderationState: post.moderationState,
       principalId: post.principalId,
       isCommentsLocked: post.isCommentsLocked,
+      isMerged: !!post.canonicalPostId,
     },
     { access: board.access },
     portalConfig.moderationDefault.requireApproval

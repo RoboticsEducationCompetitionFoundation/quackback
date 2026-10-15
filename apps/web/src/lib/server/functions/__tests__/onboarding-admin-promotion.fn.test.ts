@@ -149,6 +149,10 @@ beforeEach(() => {
   // about the ordering between exactly those two.
   hoisted.txExecute.mockImplementation(async (statement: { queryChunks?: unknown[] }) => {
     const text = JSON.stringify(statement?.queryChunks ?? '')
+    if (text.includes('setup_state')) {
+      const row = await hoisted.getSettings()
+      return row ? [{ setup_state: row.setupState ?? null }] : []
+    }
     if (!text.includes('cloud_workspace_key')) return undefined
     return [{ stamp_column: hoisted.stamp.value, metadata: null }]
   })
@@ -300,6 +304,21 @@ describe('saveWorkspaceAndGoalFn bootstrap authorization', () => {
 
   // The workspace this guard exists for. Every fact is identical to the
   // promotion case above except the one the control plane wrote.
+  // A stored setup state that cannot be parsed is not an absent one. Reading
+  // it as absent would reopen a finished workspace whose admins are gone to
+  // whoever signs in next, so the claim is refused instead.
+  it('refuses to promote an arrival when the stored setup state is unreadable', async () => {
+    hoisted.getSettings.mockResolvedValue({ ...STAMPED_SETTINGS, setupState: '{not json' })
+    hoisted.principalFindFirst.mockResolvedValue(undefined)
+
+    await expect(
+      saveWorkspaceAndGoalFn({ data: { workspaceName: 'Acme', useCase: 'product_feedback' } })
+    ).rejects.toThrow(/already set up/i)
+    expect(hoisted.ensurePrincipalForUser).not.toHaveBeenCalled()
+    expect(hoisted.setPrincipalRole).not.toHaveBeenCalled()
+    expect(hoisted.settingsInsert).not.toHaveBeenCalled()
+  })
+
   it('refuses to promote an arrival on a workspace a control plane created', async () => {
     hoisted.stamp.value = 'ws_acme'
     hoisted.getSettings.mockResolvedValue(undefined)

@@ -1057,4 +1057,19 @@ export const MODULE_STATE_LEDGER: readonly LedgerEntry[] = [
       "app registration and client secret, so a cross-workspace hit would lend one tenant's " +
       'directory credentials to another.',
   },
+  {
+    file: 'apps/web/src/lib/server/auth/provider-trust.ts',
+    name: 'reportedObservations',
+    category: 'workspace-scoped-key',
+    keyedBy: 'row.id',
+    reason:
+      'The last connection-test state this process logged for each untested identity provider, ' +
+      'keyed by the provider row id (a random uuid, unique across workspaces) and holding only ' +
+      'that row’s two test timestamps, so an auth rebuild does not repeat the same info line. ' +
+      'One entry per row, dropped once the provider is trusted, and capped at ' +
+      'MAX_REPORTED_OBSERVATIONS with oldest-first eviction so rows deleted while still ' +
+      'untested cannot accumulate. It holds no workspace data and gates nothing but ' +
+      'a log line: a wrong hit would drop one informational line, never change which providers ' +
+      'are trusted.',
+  },
 ]
