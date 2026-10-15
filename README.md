@@ -1,8 +1,43 @@
+<h1 align="center">RECF Feedback &amp; Support Portal</h1>
+
 <p align="center">
-  <a href="https://quackback.io">
-    <img src=".github/logo.svg" alt="Quackback Logo" width="80" height="80" />
-  </a>
+  <strong>A modified version of <a href="https://github.com/QuackbackIO/quackback">Quackback</a>, maintained by the Robotics Education &amp; Competition Foundation.</strong>
 </p>
+
+<p align="center">
+  <a href="https://quack.recf.org">quack.recf.org</a> &middot;
+  <a href="https://c2.recf.org">Competition Control</a> &middot;
+  <a href="https://github.com/QuackbackIO/quackback">Upstream Quackback</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/RoboticsEducationCompetitionFoundation/quackback/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="License" /></a>
+  <a href="https://github.com/RoboticsEducationCompetitionFoundation/quackback/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/RoboticsEducationCompetitionFoundation/quackback/ci.yml?label=CI" alt="CI" /></a>
+  <a href="https://github.com/RoboticsEducationCompetitionFoundation/quackback/actions/workflows/deploy-azure.yml"><img src="https://img.shields.io/github/actions/workflow/status/RoboticsEducationCompetitionFoundation/quackback/deploy-azure.yml?label=deploy" alt="Deploy" /></a>
+</p>
+
+## About this repository
+
+This is the [Robotics Education & Competition Foundation](https://www.roboticseducation.org/) (RECF) fork of [Quackback](https://github.com/QuackbackIO/quackback), the open-source support and product feedback platform. RECF runs it at [quack.recf.org](https://quack.recf.org) as the feedback and support portal for [Competition Control](https://c2.recf.org) (`c2.recf.org`), the platform RECF operates for running its robotics competitions. The portal collects feature requests and bug reports, answers support questions, and publishes changelog and status updates for Competition Control and related RECF tools.
+
+**If you want Quackback for your own use or modification, start from the official repository instead: <https://github.com/QuackbackIO/quackback>.** That is where the project is developed, documented, and supported, and where contributions belong. This fork is tailored to RECF's deployment and is not maintained as a general-purpose distribution; it is published because the [AGPL-3.0](LICENSE) requires the source of a modified version that is run as a network service to be available to its users.
+
+### How this fork differs from upstream
+
+- **Branding.** User-visible Quackback branding in the portal, embeddable widget, and emails is replaced with RECF branding. Package names, environment variables, and storage keys are unchanged so upstream changes still apply cleanly.
+- **Legal pages and cookie consent.** Adds `/legal/*` pages (Terms of Service, Privacy Policy, Cookie Policy, Acceptable Use Policy) written for RECF's portal, a cookie consent banner that gates visitor analytics, and host-page consent handling in the widget. The legal text is specific to RECF and should not be reused as-is.
+- **Azure deployment.** Adds an Azure Blob Storage backend for uploads and a GitHub Actions workflow (`deploy-azure.yml`) that builds the production image, pushes it to Azure Container Registry, and updates the App Service after CI passes on `main`.
+- **Upstream sync.** Security and correctness fixes from upstream are cherry-picked periodically (see the `sync/*` branches and merged PRs). This fork may lag upstream; feature development happens upstream.
+
+### Contributing
+
+Issues and pull requests in this repository are for RECF's deployment only (branding, legal text, Azure configuration, and the like). Bug fixes and features that apply to Quackback itself should be opened against the [upstream repository](https://github.com/QuackbackIO/quackback) so that every user benefits; upstream contributions are governed by the upstream [CLA](CLA.md). RECF-specific changes here do not require a CLA.
+
+Support requests for Competition Control should go through the portal at [quack.recf.org](https://quack.recf.org), not this repository's issue tracker.
+
+---
+
+The remainder of this document is the upstream Quackback README, retained for reference. Links in it point to the upstream project.
 
 <h1 align="center">Quackback</h1>
 
@@ -19,13 +54,6 @@
   <a href="https://quackback.io">Website</a> &middot;
   <a href="https://quackback.io/docs">Docs</a> &middot;
   <a href="#get-started">Get Started</a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/QuackbackIO/quackback/stargazers"><img src="https://img.shields.io/github/stars/QuackbackIO/quackback?style=flat&color=f5a623" alt="GitHub stars" /></a>
-  <a href="https://github.com/QuackbackIO/quackback/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0-blue" alt="License" /></a>
-  <a href="https://github.com/QuackbackIO/quackback/actions"><img src="https://img.shields.io/github/actions/workflow/status/QuackbackIO/quackback/ci.yml?label=CI" alt="CI" /></a>
-  <a href="https://github.com/QuackbackIO/quackback/issues"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a>
 </p>
 
 <p align="center">
@@ -125,4 +153,6 @@ Log in with `demo@example.com` / `password`.
 - **Self-hosting** — free and fully functional, no limits
 - **Modifications** — if you distribute or run a modified version as a service, open-source your changes under AGPL-3.0
 
-Contributions require signing our [CLA](CLA.md).
+Contributions to upstream Quackback require signing the [CLA](CLA.md).
+
+Quackback is copyright its original authors and contributors. RECF's modifications in this fork are likewise released under AGPL-3.0; the complete corresponding source for the version running at quack.recf.org is this repository's `main` branch.
