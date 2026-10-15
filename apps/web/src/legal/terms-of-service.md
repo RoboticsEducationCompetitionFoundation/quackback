@@ -4,7 +4,8 @@ title: Terms and Conditions
 
 <!-- This is the counsel-approved text ("Competition Control Terms.md", September 2026),
      reproduced verbatim apart from Markdown formatting. Do not edit the legal language here
-     without routing the change back through counsel. -->
+     without routing the change back through counsel. Section 12A (AI features) is a draft
+     addition pending counsel review. -->
 
 # Competition Control Website and Cloud Services Terms and Conditions
 
@@ -214,6 +215,43 @@ including RECF's general website, the REC Library knowledge base, and the projec
 the open source components identified in Section 8. The inclusion of a link does not imply
 endorsement, approval, or control by RECF, we are not responsible for the content or
 practices of any linked site, and your use of any linked site is at your own risk.
+
+## 12A. AI features
+
+Certain features of the Site and Services use artificial intelligence ("AI") models provided
+to RECF through Microsoft's Azure OpenAI Service. These features may generate answers to your
+questions, conversational replies, summaries, translations, suggested categories, and
+suggested duplicate matches, and may analyze the content you submit (collectively, "AI
+Output"). AI Output is generated automatically and is generally not reviewed by a person
+before it is shown to you.
+
+**AI Output is not a statement by RECF.** AI Output does not represent the views, opinions,
+positions, policies, or official statements of RECF or of its directors, officers, employees,
+volunteers, partners, or sponsors, and RECF does not endorse it. AI Output is not an official
+interpretation of any game manual, competition rule, or event policy, and is not a ruling of
+the official question-and-answer system, a referee, an event partner, or RECF. Official
+rules, rulings, and announcements are published only through RECF's official channels.
+
+**AI Output may be wrong.** AI Output may be inaccurate, incomplete, outdated, misleading, or
+offensive, and may misstate facts, cite sources that do not support it, or describe features,
+plans, or commitments that do not exist. AI Output is not legal, safety, medical, financial,
+or other professional advice. AI Output does not create any obligation, promise, commitment,
+or agreement on behalf of RECF, including any commitment about features, timelines, support,
+eligibility, or competition outcomes. You are responsible for independently verifying AI
+Output before relying on it, and you use it at your own risk.
+
+**Your inputs.** You are responsible for the questions, messages, and other content you submit
+to AI features, which must comply with the Acceptable Use Policy. Do not submit sensitive
+personal information, or personal information about students or other minors, to AI
+features. Content you submit is processed by our AI provider as described in the Privacy
+Policy.
+
+**Reporting.** If AI Output is inaccurate, offensive, or otherwise inappropriate, please report
+it to support@recf.org. RECF may modify, limit, suspend, or discontinue any AI feature at any
+time.
+
+AI Output is part of the Site and Services for the purposes of Sections 13 and 14. Where AI
+Output translates content, the original-language version controls.
 
 ## 13. Disclaimer of warranties
 

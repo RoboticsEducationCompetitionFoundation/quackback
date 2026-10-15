@@ -4,7 +4,9 @@ title: Privacy Policy
 
 <!-- This is the counsel-approved text ("Competition Control Privacy Policy.md", September 2026),
      reproduced verbatim apart from Markdown formatting. Do not edit the legal language here
-     without routing the change back through counsel. -->
+     without routing the change back through counsel. The "AI features" subsection and the Azure
+     OpenAI Service addition under "How we share information" are draft additions pending
+     counsel review. -->
 
 # Competition Control Privacy Policy
 
@@ -141,6 +143,19 @@ submit. **Feedback posts, votes, and comments are publicly visible on the feedba
 together with your display name**; your email address is not publicly displayed. The
 feedback portal does not receive event data or event server credentials.
 
+### AI features
+
+Certain features of the feedback portal use AI models provided through Microsoft's Azure
+OpenAI Service, as described in Section 12A of the Terms and Conditions. When you use these
+features, or when RECF staff use them to review submissions, the relevant content — such as
+your question or message, feedback posts and comments, and related help center articles — is
+sent to the Azure OpenAI Service to generate answers, summaries, translations, and
+suggestions. RECF does not use your content to train AI models, and under Microsoft's terms
+for the Azure OpenAI Service, Microsoft does not use it to train its models. AI-generated
+answers and conversations are stored with your feedback and support history and are retained
+on the same basis. Do not submit sensitive personal information, or personal information
+about students or other minors, to AI features.
+
 ### Device and browser storage
 
 Client devices connected to a host computer store: a randomly generated device identifier
@@ -207,7 +222,8 @@ benchmarking, reporting, service improvement, and other lawful business purposes
 
 We do not sell personal information. We share information only with service providers who
 process it on our behalf — currently Microsoft Corporation (Azure cloud hosting, Entra ID
-identity, Azure Monitor diagnostics) — and as required by law.
+identity, Azure Monitor diagnostics, and the Azure OpenAI Service for AI features) — and as
+required by law.
 
 When an event organizer publishes an event, the results described in "Public results API
 and published events" above become publicly available to anyone using our results API,

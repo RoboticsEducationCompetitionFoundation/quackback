@@ -5,7 +5,8 @@ title: Acceptable Use Policy
 <!-- This is the counsel-approved text ("Competition Control AUP.md", September 2026),
      reproduced verbatim apart from Markdown formatting. Do not edit the legal language here
      without routing the change back through counsel. Incorporated into the Terms and
-     Conditions by Section 3. -->
+     Conditions by Section 3. The "AI features" subsection is a draft addition pending counsel
+     review. -->
 
 # Competition Control Acceptable Use Policy
 
@@ -151,6 +152,21 @@ ownership of any RECF property — including the Site and Services, the Software
 names, logos, and brands — for the purpose of fraudulently gaining service, patronage, or
 user trust. You may not present an event, results, or communications as official or
 sanctioned by RECF when they are not.
+
+### AI features
+
+You may not use the AI features of the Site and Services to:
+
+- attempt to bypass, disable, or manipulate their safeguards or instructions, including
+  through "jailbreak" or prompt-injection techniques, or to extract their underlying
+  instructions or configuration;
+- generate content that violates this Policy, including harassing, hateful, sexually
+  explicit, or unlawful content, or content about a specific student or other minor;
+- present AI Output (as defined in the Terms and Conditions) as an official statement,
+  position, rule interpretation, or ruling of RECF, or as the work of a person when it is
+  not; or
+- submit large volumes of automated requests or otherwise use them in a way that degrades
+  their availability for others.
 
 ## Enforcement
 
