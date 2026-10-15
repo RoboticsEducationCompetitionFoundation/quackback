@@ -7,6 +7,9 @@ export const CONSENT_COOKIE_NAME = 'cookieconsent_status'
 
 const ONE_YEAR_SECONDS = 31536000
 
+/** Carries a choice made in one tab to the others, since cookie writes fire no event. */
+const SYNC_CHANNEL_NAME = 'cookie-consent'
+
 export function parseConsentCookie(cookieHeader: string | null): ConsentStatus | null {
   if (!cookieHeader) return null
   const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${CONSENT_COOKIE_NAME}=([^;]*)`))
@@ -14,25 +17,37 @@ export function parseConsentCookie(cookieHeader: string | null): ConsentStatus |
   return value === 'allow' || value === 'deny' ? value : null
 }
 
-let status: ConsentStatus | null | undefined
 let settingsOpen = false
 const listeners = new Set<() => void>()
+let detachSync: (() => void) | null = null
 
+// Always read the cookie rather than caching it: it is shared across tabs, so a
+// choice made elsewhere must be seen the next time anything here asks.
 function currentStatus(): ConsentStatus | null {
-  if (status === undefined) status = parseConsentCookie(document.cookie)
-  return status
+  return parseConsentCookie(document.cookie)
 }
 
 function notify() {
   for (const listener of listeners) listener()
 }
 
+function broadcast(next: ConsentStatus) {
+  if (typeof BroadcastChannel === 'undefined') return
+  try {
+    const channel = new BroadcastChannel(SYNC_CHANNEL_NAME)
+    channel.postMessage(next)
+    channel.close()
+  } catch {
+    // Sync is best-effort; the cookie is still re-read on focus.
+  }
+}
+
 export function setConsent(next: ConsentStatus): void {
   const secure = window.location.protocol === 'https:' ? ';secure' : ''
   document.cookie = `${CONSENT_COOKIE_NAME}=${next};path=/;max-age=${ONE_YEAR_SECONDS};samesite=lax${secure}`
-  status = next
   settingsOpen = false
   notify()
+  broadcast(next)
 }
 
 /** Reopens the banner so a visitor can change an earlier choice. */
@@ -41,10 +56,39 @@ export function openCookieSettings(): void {
   notify()
 }
 
+// Wakes idle tabs when the shared cookie changes: a message from the tab that
+// changed it, or this tab regaining focus after a change made somewhere else.
+function attachSync(): () => void {
+  const onChange = () => notify()
+  window.addEventListener('focus', onChange)
+  window.addEventListener('pageshow', onChange)
+  document.addEventListener('visibilitychange', onChange)
+  let channel: BroadcastChannel | null = null
+  if (typeof BroadcastChannel !== 'undefined') {
+    try {
+      channel = new BroadcastChannel(SYNC_CHANNEL_NAME)
+      channel.onmessage = onChange
+    } catch {
+      channel = null
+    }
+  }
+  return () => {
+    window.removeEventListener('focus', onChange)
+    window.removeEventListener('pageshow', onChange)
+    document.removeEventListener('visibilitychange', onChange)
+    channel?.close()
+  }
+}
+
 function subscribe(listener: () => void) {
+  if (listeners.size === 0) detachSync = attachSync()
   listeners.add(listener)
   return () => {
     listeners.delete(listener)
+    if (listeners.size === 0) {
+      detachSync?.()
+      detachSync = null
+    }
   }
 }
 
@@ -70,10 +114,4 @@ export function useCookieConsent(): {
     status: value === 'unset' ? null : (value as ConsentStatus | 'pending'),
     settingsOpen: open === '1',
   }
-}
-
-/** Forgets the cached choice so the next read comes from document.cookie. */
-export function resetCookieConsentForTests(): void {
-  status = undefined
-  settingsOpen = false
 }

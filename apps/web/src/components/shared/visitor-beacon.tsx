@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useRouterState } from '@tanstack/react-router'
-import { useCookieConsent } from '@/lib/client/cookie-consent'
+import { parseConsentCookie, useCookieConsent } from '@/lib/client/cookie-consent'
 import { useIsPublicSurface } from './cookie-consent-banner'
 
 /**
@@ -40,6 +40,9 @@ export function VisitorBeacon() {
 
   useEffect(() => {
     if (consent !== 'allow' || !isPublicSurface || lastTracked.current === href) return
+    // The cookie is shared across tabs; confirm it at send time rather than
+    // trusting the value this tab last rendered with.
+    if (parseConsentCookie(document.cookie) !== 'allow') return
     const nav = navigator as Navigator & { globalPrivacyControl?: boolean }
     if (nav.doNotTrack === '1' || nav.globalPrivacyControl === true) return
     lastTracked.current = href

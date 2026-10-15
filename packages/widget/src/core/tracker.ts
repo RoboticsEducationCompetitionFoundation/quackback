@@ -44,7 +44,9 @@ export function createTracker(instanceUrl: string, deviceId: string | null = nul
     (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true
 
   function send(): void {
-    if (!active) return
+    // Re-checked per pageview: the host banner may have withdrawn consent
+    // (in this tab or another) after start().
+    if (!active || !hasHostCookieConsent()) return
     const href = window.location.href
     if (href === lastHref) return
     lastHref = href

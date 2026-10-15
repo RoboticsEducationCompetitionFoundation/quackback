@@ -82,6 +82,20 @@ describe('createTracker', () => {
     expect(sendBeacon).not.toHaveBeenCalled()
   })
 
+  it('stops sending once consent is withdrawn after start', () => {
+    tracker = createTracker(INSTANCE)
+    tracker.start()
+    expect(sendBeacon).toHaveBeenCalledTimes(1)
+
+    document.cookie = 'cookieconsent_status=deny;path=/'
+    window.history.pushState({}, '', '/after-withdrawal')
+    expect(sendBeacon).toHaveBeenCalledTimes(1)
+
+    document.cookie = 'cookieconsent_status=allow;path=/'
+    window.history.pushState({}, '', '/after-reallow')
+    expect(sendBeacon).toHaveBeenCalledTimes(2)
+  })
+
   it('includes the device id on every beacon when provided', () => {
     tracker = createTracker(INSTANCE, 'dev-abc')
     tracker.start()
