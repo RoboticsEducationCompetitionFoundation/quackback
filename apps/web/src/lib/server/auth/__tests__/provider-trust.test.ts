@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
+  MAX_REPORTED_OBSERVATIONS,
   allowsAutoLinking,
   oidcTrustedProviderIds,
+  reportedObservationCount,
   resetTrustObservations,
   type ObservedProviderRow,
 } from '../provider-trust'
@@ -97,6 +99,28 @@ describe('oidcTrustedProviderIds', () => {
     const log = recordingLog()
     oidcTrustedProviderIds(['oidc_tested'], rows, log)
     expect(log.lines).toEqual([])
+  })
+
+  it('evicts the oldest remembered providers past the cap', () => {
+    // Rows deleted while still untested never come back to be dropped, so the
+    // map is capped rather than left to grow for the life of the process.
+    const log = recordingLog()
+    for (let i = 0; i < MAX_REPORTED_OBSERVATIONS + 5; i++) {
+      oidcTrustedProviderIds(['sso'], [{ ...untestedSso, id: `idp-${i}` }], log)
+    }
+    expect(reportedObservationCount()).toBe(MAX_REPORTED_OBSERVATIONS)
+
+    // The first-remembered row was evicted, so it is reported again; the most
+    // recent one is still remembered and is not.
+    const before = log.lines.length
+    oidcTrustedProviderIds(['sso'], [{ ...untestedSso, id: 'idp-0' }], log)
+    expect(log.lines).toHaveLength(before + 1)
+    oidcTrustedProviderIds(
+      ['sso'],
+      [{ ...untestedSso, id: `idp-${MAX_REPORTED_OBSERVATIONS + 4}` }],
+      log
+    )
+    expect(log.lines).toHaveLength(before + 1)
   })
 })
 

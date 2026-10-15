@@ -68,13 +68,36 @@ export interface TrustObservationLogger {
  * same line repeats on each rebuild. One entry per row id (unique across
  * workspaces), holding that row's two timestamps: a provider is reported again
  * only when its state differs from the one stored, and its entry is dropped
- * once it is trusted, so the map never holds more than the untested providers.
+ * once it is trusted.
+ *
+ * Capped, because "dropped once trusted" is not the only way a row leaves: a
+ * provider (or its workspace) that is deleted while still untested is never
+ * seen again, and in a long-lived fleet process those entries would otherwise
+ * accumulate one per provider ever observed. Insertion order is eviction
+ * order; evicting an entry that is still live costs one repeated info line.
  */
 const reportedObservations = new Map<string, string>()
+export const MAX_REPORTED_OBSERVATIONS = 1000
+
+function rememberObservation(rowId: string, state: string): void {
+  // Re-insert so a provider reported again counts as recent.
+  reportedObservations.delete(rowId)
+  reportedObservations.set(rowId, state)
+  while (reportedObservations.size > MAX_REPORTED_OBSERVATIONS) {
+    const oldest = reportedObservations.keys().next().value
+    if (oldest === undefined) break
+    reportedObservations.delete(oldest)
+  }
+}
 
 /** Test seam: forget what has been reported. */
 export function resetTrustObservations(): void {
   reportedObservations.clear()
+}
+
+/** Test seam: how many providers are currently remembered. */
+export function reportedObservationCount(): number {
+  return reportedObservations.size
 }
 
 /**
@@ -113,7 +136,7 @@ export function oidcTrustedProviderIds(
     }
     const state = `${row.lastSuccessfulTestAt ?? ''}|${row.detailsChangedAt ?? ''}`
     if (reportedObservations.get(row.id) === state) continue
-    reportedObservations.set(row.id, state)
+    rememberObservation(row.id, state)
     log.info(
       {
         registrationId,

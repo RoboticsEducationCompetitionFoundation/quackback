@@ -115,8 +115,14 @@ export async function isOpenToBootstrapClaim(exec: Executor): Promise<boolean> {
  * finished once the wizard's steps are complete, unless a declarative config
  * file or a provisioner stamped them complete before the owner ever arrived
  * ({@link needsCloudOnboardingWizard}). That pre-stamped workspace has no owner
- * yet and its first user must still be able to claim it. No settings row is a
- * fresh install, which is open.
+ * yet and its first user must still be able to claim it. No settings row, or a
+ * row with no setup state stored yet, is a fresh install, which is open.
+ *
+ * A stored state that cannot be read is not "no state". `getSetupState`
+ * answers null for both, and treating the two alike would let a corrupted or
+ * hand-edited column reopen a finished workspace to whoever signs in next. So
+ * the raw column is inspected first: blank is open, unreadable is refused, on
+ * the same rule {@link isProvisionedWorkspace} applies to unreadable metadata.
  *
  * Take the transaction, not the pool, for the same reason as
  * {@link isOpenToBootstrapClaim}.
@@ -129,6 +135,10 @@ export async function isSetupOpenToClaim(exec: Executor): Promise<boolean> {
   if (rows.length === 0) return true
   // Not a singleton: no honest answer, so refuse rather than open.
   if (rows.length > 1) return false
-  const state = getSetupState(rows[0]!.setup_state ?? null)
+  const raw = rows[0]!.setup_state
+  if (raw === null || raw.trim() === '') return true
+  const state = getSetupState(raw)
+  // Stored but unreadable: nobody can tell, so refuse rather than open.
+  if (state === null) return false
   return !isOnboardingComplete(state) || needsCloudOnboardingWizard(state)
 }

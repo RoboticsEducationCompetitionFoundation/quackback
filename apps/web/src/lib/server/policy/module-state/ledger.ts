@@ -1066,8 +1066,9 @@ export const MODULE_STATE_LEDGER: readonly LedgerEntry[] = [
       'The last connection-test state this process logged for each untested identity provider, ' +
       'keyed by the provider row id (a random uuid, unique across workspaces) and holding only ' +
       'that row’s two test timestamps, so an auth rebuild does not repeat the same info line. ' +
-      'One entry per row, dropped once the provider is trusted, so it is bounded by the number ' +
-      'of untested providers across the fleet. It holds no workspace data and gates nothing but ' +
+      'One entry per row, dropped once the provider is trusted, and capped at ' +
+      'MAX_REPORTED_OBSERVATIONS with oldest-first eviction so rows deleted while still ' +
+      'untested cannot accumulate. It holds no workspace data and gates nothing but ' +
       'a log line: a wrong hit would drop one informational line, never change which providers ' +
       'are trusted.',
   },
