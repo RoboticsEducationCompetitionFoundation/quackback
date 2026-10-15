@@ -10,7 +10,7 @@ title: Cookie Policy
 
 # Competition Control Feedback and Support Portal Cookie Policy
 
-_Last updated: September 23, 2026_
+_Last updated: October 14, 2026_
 
 This Cookie Policy explains how the Robotics Education & Competition Foundation ("RECF", "we",
 "us", or "our") uses cookies, browser storage, scripts, and similar technologies (collectively,
@@ -76,6 +76,9 @@ With your permission, we use first-party analytics to understand how the Site is
 which pages are visited and how visitors arrive at them. These analytics are operated by RECF on
 the Site itself; no third-party analytics provider receives this information. Analytics Cookies
 are not placed, and no page visits are recorded, until you allow them through the Cookie banner.
+When the feedback widget is embedded in another RECF website, it follows the choice you made on
+that website's own Cookie banner (which sets the same `cookieconsent_status` Cookie) and records
+page visits only if you allowed non-essential Cookies there.
 
 ### D. Advertising and social media Cookies
 
@@ -101,7 +104,8 @@ improve your experience. All of the Cookies listed above are first-party Cookies
 
 **Third-party Cookies** are placed by another site. When the feedback widget is embedded in
 another website, it runs from quack.recf.org and its Cookies belong to the Site rather than to
-the website it appears on; that website's own Cookie policy governs its Cookies. If you sign in
+the website it appears on; that website's own Cookie policy governs its Cookies, and the widget
+honors the Cookie choice you made on that website as described in Section 3. If you sign in
 with a Microsoft Entra ID account, the sign-in is handled by Microsoft, which may set Cookies on
 Microsoft's sites under Microsoft's own privacy policy. We do not control Microsoft's Cookie
 practices.

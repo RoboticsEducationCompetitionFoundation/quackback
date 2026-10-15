@@ -13,7 +13,7 @@ title: Acceptable Use Policy
 
 # Competition Control Feedback and Support Portal Acceptable Use Policy
 
-_Last updated: September 23, 2026_
+_Last updated: October 14, 2026_
 
 This Acceptable Use Policy ("Policy") covers the Competition Control feedback and support
 portal at quack.recf.org (also reachable at quack.recf.cloud), including its feedback boards,

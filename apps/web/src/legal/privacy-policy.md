@@ -16,7 +16,7 @@ title: Privacy Policy
 
 # Competition Control Feedback and Support Portal Privacy Policy
 
-_Last updated: September 23, 2026_
+_Last updated: October 14, 2026_
 
 This Privacy Policy describes how the Robotics Education & Competition Foundation ("RECF",
 "we", "us") collects, uses, and shares information in connection with the Competition Control
@@ -110,8 +110,11 @@ compliance with the Terms and Conditions and to protect RECF's rights.
 When the feedback widget loads on another RECF website or application, it receives the
 address of the page it appears on and, where that website or application has signed you in,
 the account details described above. The widget keeps its own session in browser storage for
-the Portal's site, as described in the Cookie Policy. The widget does not receive event data
-or event server credentials from the Competition Control application.
+the Portal's site, as described in the Cookie Policy. The widget records the pages you visit
+on that website or application, and may store a random device identifier in its browser
+storage, only if you allowed non-essential cookies through that website's own Cookie banner.
+The widget does not receive event data or event server credentials from the Competition
+Control application.
 
 ### Email
 
@@ -187,10 +190,9 @@ benchmarking, reporting, service improvement, and other lawful business purposes
 ## How we share information
 
 We do not sell personal information. We share information only with service providers who
-process it on our behalf — currently Microsoft Corporation (Azure cloud hosting and
-databases, Entra ID identity, and the Azure OpenAI Service for AI features), Resend, Inc.
-(sending and receiving email), and Amazon Web Services, Inc. (storage of uploaded files) —
-and as required by law.
+process it on our behalf — currently Microsoft Corporation (Azure cloud hosting, databases,
+and storage of uploaded files, Entra ID identity, and the Azure OpenAI Service for AI
+features) and Resend, Inc. (sending and receiving email) — and as required by law.
 
 Feedback posts, votes, and comments you submit, together with your display name, are
 publicly visible to anyone who visits the Portal or uses the feedback widget. Support

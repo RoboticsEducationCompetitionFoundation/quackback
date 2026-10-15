@@ -14,7 +14,7 @@ title: Terms and Conditions
 
 # Competition Control Feedback and Support Portal Terms and Conditions
 
-_Last updated: September 23, 2026_
+_Last updated: October 14, 2026_
 
 These Terms and Conditions ("Terms") govern your use of the Competition Control feedback and
 support portal at <https://quack.recf.org> (also reachable at quack.recf.cloud), including
