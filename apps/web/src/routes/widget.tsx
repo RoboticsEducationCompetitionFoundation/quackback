@@ -142,6 +142,7 @@ export const Route = createFileRoute('/widget')({
       // A teammate's own portal cookie reused in the widget must never be
       // handed off as a portal session — see WidgetAuthProvider.
       canPortalHandoff: !isTeamMember(userRole),
+      isTeammate: isTeamMember(userRole),
       locale,
       messages,
     }
@@ -180,6 +181,7 @@ function WidgetLayout() {
     portalSessionToken,
     hmacRequired,
     canPortalHandoff,
+    isTeammate,
     locale,
     messages,
   } = Route.useLoaderData()
@@ -196,6 +198,7 @@ function WidgetLayout() {
       portalSessionToken={portalSessionToken}
       hmacRequired={hmacRequired}
       canPortalHandoff={canPortalHandoff}
+      isTeammate={isTeammate}
       initialLocale={locale}
       initialMessages={messages}
     >

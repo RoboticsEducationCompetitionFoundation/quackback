@@ -365,7 +365,7 @@ function WidgetPage() {
     team,
     messengerEnabled,
   } = Route.useLoaderData()
-  const { ensureSession, sessionVersion } = useWidgetAuth()
+  const { ensureSession, sessionVersion, isTeammate } = useWidgetAuth()
 
   // The loader seeds boardPermissions for the anonymous SSR baseline (no Bearer
   // at loader time). Refetch it for the REAL actor with the widget's Bearer
@@ -808,6 +808,7 @@ function WidgetPage() {
             assistant={assistant}
             canStartConversation={messengerEnabled}
             onOpenMessenger={openMessenger}
+            teamInboxHref={isTeammate ? `${portalOrigin}/admin/inbox` : null}
           />
         </ViewTransition>
       )}
